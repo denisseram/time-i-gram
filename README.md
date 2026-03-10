@@ -133,7 +133,7 @@ embed = {
 
 ---
 
-## Examples
+## Usage Example
 
 ### U.S. Unemployment Across Industries — Circular Overview + Linked Detail
 

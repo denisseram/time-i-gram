@@ -135,75 +135,138 @@ embed = {
 
 ## Examples
 
-### Temporal Overview + Detail
+### U.S. Unemployment Across Industries — Circular Overview + Linked Detail
 
-An overview+detail pattern with brush-based linking for exploring unemployment rates across industries over time.
+A multi-view dashboard combining a **circular overview** (left) with **linked detail panels** (right) for exploring U.S. unemployment across five industry sectors (2000–2010). Brushing on the circular view or the timeline bar filters all detail panels via coordinated linking.
 
-```jsonc
-{
-  "title": "Unemployment Rates",
-  "tracks": [
+<img src="gif.gif" alt="Demo of the unemployment visualization with circular overview and linked detail panels" width="100%">
+
+```js
+import { embed } from '@vanessa_stoiber1999/time-i-gram';
+
+const CSV_URL =
+  "https://raw.githubusercontent.com/denisseram/time-i-gram/14a22f2e66006df8a8498e2c0d6f992c5b49a810/unemployment-across-industries.csv";
+
+const baseData = {
+  type: "csv-time",
+  url: CSV_URL,
+  separator: ",",
+  dateFields: ["date"],
+  sampleLength: 2000,
+  genomicFields: ["date"]
+};
+
+const timeDomain = { interval: [946713600, 1293782400] };
+const industries = ["Government", "Manufacturing", "Construction", "Information", "Finance"];
+
+// Helper: create an area + line overlay for one industry
+function industryTracks(series, width, height) {
+  return [
     {
-      "title": "Overview",
-      "data": { "type": "json-time", "timestampField": "time", "values": [] },
-      "mark": "line",
-      "x": { "field": "time", "type": "temporal", "axis": "bottom" },
-      "alignment": "overlay",
-      "tracks": [
-        {},
-        { "mark": "brush", "x": { "linkingId": "detail-link" }, "color": { "value": "steelBlue" } }
-      ],
-      "width": 800,
-      "height": 50
+      data: { ...baseData },
+      dataTransform: [{ type: "filter", field: "series", oneOf: [series] }],
+      x: { field: "date", type: "temporal", axis: "bottom", domain: timeDomain, linkingId: "detail-link" },
+      y: { field: "count", type: "quantitative", axis: "left" },
+      color: { field: "series", type: "nominal", domain: industries },
+      mark: "area",
+      opacity: { value: 0.3 },
+      width,
+      height,
+      style: { outline: "none" }
     },
     {
-      "title": "Detail",
-      "data": {
-        "url": "https://raw.githubusercontent.com/vega/vega/main/docs/data/unemployment-across-industries.json",
-        "type": "json-time",
-        "dateFields": ["year", "month"]
-      },
-      "mark": "line",
-      "x": { "field": "year", "type": "temporal", "axis": "bottom", "linkingId": "detail-link" },
-      "y": { "field": "count", "type": "quantitative" },
-      "width": 800,
-      "height": 200
+      data: { ...baseData },
+      dataTransform: [{ type: "filter", field: "series", oneOf: [series] }],
+      x: { field: "date", type: "temporal", axis: "bottom", domain: timeDomain, linkingId: "detail-link" },
+      y: { field: "count", type: "quantitative", axis: "left" },
+      color: { field: "series", type: "nominal", domain: industries },
+      mark: "line",
+      size: { value: 1.5 },
+      width,
+      height,
+      style: { outline: "none" }
     }
-  ]
+  ];
 }
-```
 
-### Multi-track Weather Dashboard
-
-Combine precipitation bars, temperature lines, and categorical weather annotations with semantic zooming — all linked across views.
-
-```jsonc
-{
-  "title": "Seattle Weather",
-  "views": [
+const spec = {
+  title: "U.S. Unemployment Across Industries (2000–2010)",
+  subtitle: "Monthly number of unemployed persons by industry sector — Source: U.S. Bureau of Labor Statistics (BLS)",
+  arrangement: "horizontal",
+  views: [
+    // ── LEFT: Circular overview with brush ──
     {
-      "alignment": "overlay",
-      "tracks": [{
-        "data": { "url": "...seattle-weather.csv", "type": "csv-time", "dateFields": ["date"] },
-        "mark": "bar",
-        "x": { "field": "date", "type": "temporal", "axis": "bottom", "linkingId": "linked-views" },
-        "y": { "field": "precipitation", "type": "quantitative" },
-        "width": 800, "height": 80
-      }]
+      layout: "circular",
+      title: "Cyclical Unemployment Patterns",
+      subtitle: "Each ring shows the monthly unemployment count for one industry — drag the brush to zoom into a period",
+      centerRadius: 0.35,
+      alignment: "overlay",
+      width: 450,
+      height: 450,
+      tracks: [
+        ...industries.map((s) => ({
+          data: { ...baseData },
+          dataTransform: [{ type: "filter", field: "series", oneOf: [s] }],
+          x: { field: "date", type: "temporal", axis: "top", domain: timeDomain },
+          y: { field: "count", type: "quantitative", axis: "right" },
+          color: { field: "series", type: "nominal", domain: industries, legend: true },
+          mark: "line",
+          width: 450,
+          height: 450,
+          style: { outline: "none" }
+        })),
+        { mark: "brush", x: { linkingId: "detail-link" }, color: { value: "steelBlue" } }
+      ]
     },
+    // ── RIGHT: Detail panels stacked vertically ──
     {
-      "alignment": "overlay",
-      "tracks": [{
-        "data": { "url": "...seattle-weather.csv", "type": "csv-time", "dateFields": ["date"] },
-        "mark": "line",
-        "x": { "field": "date", "type": "temporal", "axis": "bottom", "linkingId": "linked-views" },
-        "y": { "field": "temp_max", "type": "quantitative" },
-        "width": 800, "height": 80
-      }]
+      arrangement: "vertical",
+      views: [
+        {
+          title: "Public & Industrial Sectors",
+          subtitle: "Monthly unemployed persons (thousands) in Government, Manufacturing, and Construction",
+          alignment: "overlay",
+          width: 500,
+          height: 130,
+          tracks: ["Government", "Manufacturing", "Construction"].flatMap((s) => industryTracks(s, 500, 130))
+        },
+        {
+          title: "Service & Knowledge Sectors",
+          subtitle: "Monthly unemployed persons (thousands) in Information and Finance",
+          alignment: "overlay",
+          width: 500,
+          height: 130,
+          tracks: ["Information", "Finance"].flatMap((s) => industryTracks(s, 500, 130))
+        },
+        {
+          title: "Timeline Overview",
+          subtitle: "Aggregate unemployment count — drag to select a time window",
+          alignment: "overlay",
+          width: 500,
+          height: 60,
+          tracks: [
+            {
+              data: { ...baseData },
+              x: { field: "date", type: "temporal", axis: "bottom", domain: timeDomain },
+              y: { field: "count", type: "quantitative", axis: "none" },
+              color: { value: "#94a3b8" },
+              mark: "bar",
+              width: 500,
+              height: 60,
+              style: { outline: "none" }
+            },
+            { mark: "brush", x: { linkingId: "detail-link" }, color: { value: "steelBlue" } }
+          ]
+        }
+      ]
     }
   ]
-}
+};
+
+embed(document.getElementById("container"), spec);
 ```
+
+
 
 ---
 

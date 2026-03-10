@@ -261,12 +261,6 @@ time-i-gram is built on top of these excellent projects:
 
 ---
 
-## License
-
-This project is licensed under the [MIT License](LICENSE.md).
-
----
-
 ## Citation
 
 If you use time-i-gram in your research, please cite:

@@ -139,7 +139,6 @@ embed = {
 
 A multi-view dashboard combining a **circular overview** (left) with **linked detail panels** (right) for exploring U.S. unemployment across five industry sectors (2000–2010). Brushing on the circular view or the timeline bar filters all detail panels via coordinated linking.
 
-<img src="gif.gif" alt="Demo of the unemployment visualization with circular overview and linked detail panels" width="100%">
 
 ```js
 import { embed } from '@vanessa_stoiber1999/time-i-gram';
@@ -265,6 +264,9 @@ const spec = {
 
 embed(document.getElementById("container"), spec);
 ```
+
+<img src="gif.gif" alt="Demo of the unemployment visualization with circular overview and linked detail panels" width="100%">
+
 
 
 

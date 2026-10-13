@@ -7,7 +7,8 @@ import type {
     SingleTrack,
     Channel,
     Color,
-    Stroke
+    Stroke,
+    Domain
 } from '@gosling-lang/gosling-schema';
 import { validateTrack, getGenomicChannelFromTrack, getGenomicChannelKeyFromTrack, getTemporalChannelFromTrack } from '@gosling-lang/gosling-schema';
 import {
@@ -23,7 +24,7 @@ import {
 } from 'd3-scale';
 import { interpolateViridis } from 'd3-scale-chromatic';
 import { min as d3min, max as d3max, sum as d3sum, group } from 'd3-array';
-import { HIGLASS_AXIS_SIZE } from '../../compiler/higlass-model';
+import { getXAxisSize } from '../../compiler/higlass-model';
 import { SUPPORTED_CHANNELS } from '../../core/mark';
 import type { PIXIVisualProperty } from '../../core/visual-property.schema';
 import { rectProperty } from '../../core/mark/rect';
@@ -52,6 +53,19 @@ export type ScaleType =
     | ScaleTime<any, any>
     | ScaleSequential<any>
     | (() => string | number); // constant value
+
+/**
+ * Space at the top of each row that marks do not use: the header strip (linear tracks on a temporal axis, see
+ * `core/mark/temporal-header.ts`), set by the track as `_headerHeight`, plus half a label, so that the top tick
+ * label of the y axis stays below the header; at most half of the row.
+ */
+function headerHeightIn(spec: SingleTrack, rowHeight: number): number {
+    const header = (spec as { _headerHeight?: number })._headerHeight ?? 0;
+    return Math.min(header > 0 ? header + HEADER_LABEL_MARGIN : 0, rowHeight / 2);
+}
+
+/** Half the height of a y-axis label, in px. */
+const HEADER_LABEL_MARGIN = 7;
 
 export class GoslingTrackModel {
     private id: string;
@@ -154,8 +168,9 @@ export class GoslingTrackModel {
             spec.height = width;
         }
 
-        // If axis presents, reserve a space to show axis
-        const xOrY = this.getGenomicChannelKey();
+        // If axis presents, reserve a space to show axis (a temporal x axis as well: its labels go in that space)
+        const xOrY =
+            this.getGenomicChannelKey() ?? (IsChannelDeep(spec.x) && spec.x.type === 'temporal' ? 'x' : undefined);
         let isAxisShown = false;
         if (xOrY === 'x') {
             isAxisShown = IsChannelDeep(spec.x) && spec.x.axis !== undefined && spec.x.axis !== 'none';
@@ -167,15 +182,15 @@ export class GoslingTrackModel {
             if (IsChannelDeep(spec.x) && spec.x.axis !== undefined && spec.x.axis !== 'none') {
                 // for linear layouts, prepare a horizontal or vertical space for the axis
                 // we already switched the width and height in vertical tracks, so use `height`
-                spec.height -= HIGLASS_AXIS_SIZE;
+                spec.height -= getXAxisSize(spec);
             }
             // TODO: consider 2D
         } else {
             // for circular layouts, prepare a space in radius for the axis
             if (xOrY === 'x' && isAxisShown && IsChannelDeep(spec.x) && spec.x.axis === 'top') {
-                spec['outerRadius'] = ((spec['outerRadius'] as number) - HIGLASS_AXIS_SIZE) as number;
+                spec['outerRadius'] = ((spec['outerRadius'] as number) - getXAxisSize(spec)) as number;
             } else if (xOrY === 'x' && isAxisShown && IsChannelDeep(spec.x) && spec.x.axis === 'bottom') {
-                spec['innerRadius'] = ((spec['innerRadius'] as number) + HIGLASS_AXIS_SIZE) as number;
+                spec['innerRadius'] = ((spec['innerRadius'] as number) + getXAxisSize(spec)) as number;
             }
         }
 
@@ -582,7 +597,7 @@ export class GoslingTrackModel {
                             channel.range = [0, spec.width] as [number, number]; // TODO: not considering vertical direction tracks
                             break;
                         case 'y':
-                            channel.range = [0, rowHeight];
+                            channel.range = [0, rowHeight - headerHeightIn(spec, rowHeight)];
                             break;
                     }
                 }
@@ -602,7 +617,7 @@ export class GoslingTrackModel {
                             value = (spec.width as number) / 2.0;
                             break;
                         case 'y':
-                            if (spec.mark === 'withinLink') value = rowHeight;
+                            if (spec.mark === 'withinLink') value = rowHeight - headerHeightIn(spec, rowHeight);
                             else value = rowHeight / 2.0;
                             break;
                         case 'size':
@@ -661,8 +676,8 @@ export class GoslingTrackModel {
                                 : (d3min(data.map(d => +d[channel.field as string]) as number[]) as number) ?? 0;
                         const max = (d3max(data.map(d => +d[channel.field as string]) as number[]) as number) ?? 0;
                         channel.domain = [min, max]; // TODO: what if data ranges in negative values
-                    } else if (channel.type === 'genomic' && !IsDomainArray(channel.domain)) {
-                        channel.domain = getNumericDomain(channel.domain);
+                    } else if (channel.type === 'genomic' && !IsDomainArray(channel.domain as Domain)) {
+                        channel.domain = getNumericDomain(channel.domain as Domain);
                     }
 
                     if (
@@ -684,7 +699,7 @@ export class GoslingTrackModel {
                                 break;
                             case 'y':
                             case 'ye':
-                                range = [0, rowHeight];
+                                range = [0, rowHeight - headerHeightIn(spec, rowHeight)];
                                 break;
                             case 'color':
                             case 'stroke':
@@ -900,7 +915,7 @@ export class GoslingTrackModel {
      */
     public getChannelDomainArray(channelKey: keyof typeof ChannelTypes): string[] | number[] | undefined {
         const c = this.spec()[channelKey];
-        return IsChannelDeep(c) && IsDomainArray(c.domain) ? c.domain : undefined;
+        return IsChannelDeep(c) && IsDomainArray(c.domain as Domain) ? (c.domain as string[] | number[]) : undefined;
     }
 
     /**

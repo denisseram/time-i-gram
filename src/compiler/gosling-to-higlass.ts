@@ -1,6 +1,6 @@
 import * as uuid from 'uuid';
 import type { Track as HiGlassTrack } from '@gosling-lang/higlass-schema';
-import { HiGlassModel, HIGLASS_AXIS_SIZE } from './higlass-model';
+import { HiGlassModel, HIGLASS_AXIS_SIZE, TIME_AXIS_SIZE, getXAxisSize } from './higlass-model';
 import { parseServerAndTilesetUidFromUrl } from '../core/utils';
 import type { Track, Domain } from '@gosling-lang/gosling-schema';
 import type { BoundingBox, RelativePosition } from './bounding-box';
@@ -20,6 +20,7 @@ import { DEWFAULT_TITLE_PADDING_ON_TOP_AND_BOTTOM } from './defaults';
 import type { CompleteThemeDeep } from '../core/utils/theme';
 import { DEFAULT_TEXT_STYLE } from '../core/utils/text-style';
 import type { GoslingToHiGlassIdMapper } from '../api/track-and-view-ids';
+import { ABSOLUTE_TIME, getTrackTimeCoordinates, getTrackTimeUnitTiling } from '../core/utils/time-coordinate-system';
 
 /**
  * Convert a gosling track into a HiGlass view and add it into a higlass model.
@@ -86,14 +87,14 @@ export function goslingToHiGlass(
             (firstResolvedSpec.layout !== 'circular' &&
             firstResolvedSpec.orientation === 'vertical' &&
             IsXAxis(firstResolvedSpec)
-                ? HIGLASS_AXIS_SIZE
+                ? getXAxisSize(firstResolvedSpec)
                 : 0);
         const height =
             bb.height -
             (firstResolvedSpec.layout !== 'circular' &&
             firstResolvedSpec.orientation === 'horizontal' &&
             IsXAxis(firstResolvedSpec)
-                ? HIGLASS_AXIS_SIZE
+                ? getXAxisSize(firstResolvedSpec)
                 : 0);
         const hgTrack: HiGlassTrack = {
             uid: `${trackId}-track`, // This is being used to cache the visualization
@@ -151,18 +152,31 @@ export function goslingToHiGlass(
                 const cDef = firstResolvedSpec[c];
                 return cDef && IsChannelDeep(cDef) ? cDef.field : undefined;
             };
-            const xFields = {
-                x: getFieldName('x'),
-                xe: getFieldName('xe'),
-                x1: getFieldName('x1'),
-                x1e: getFieldName('x1e')
-            } as const;
+            const timeCoordinates = getTrackTimeCoordinates(firstResolvedSpec);
+            const timeUnitTiling = getTrackTimeUnitTiling(firstResolvedSpec);
+            const xFields = timeUnitTiling
+                ? {
+                      // `x.timeUnit`: the binned fields are computed per tile by the track, so tiles are assigned by
+                      // the coordinates of the raw times and of their units (see `isRowInTile`)
+                      x:
+                          timeCoordinates?.fields.find(f => f.source === timeUnitTiling.source)?.coord ??
+                          timeUnitTiling.source
+                  }
+                : ({
+                      x: getFieldName('x'),
+                      xe: getFieldName('xe'),
+                      x1: getFieldName('x1'),
+                      x1e: getFieldName('x1e')
+                  } as const);
             // use gosling's custom data fetchers
             hgTrack.data = {
                 ...firstResolvedSpec.data,
                 ...xFields,
                 // Additionally, add assembly, otherwise, a default genome build is used
-                assembly
+                assembly,
+                // How a time data fetcher maps rows into the axis' time coordinate system (period, relative)
+                ...(timeCoordinates ? { timeCoordinates } : {}),
+                ...(timeUnitTiling ? { timeUnitTiling } : {})
                 // TODO: should look all sub tracks' `dataTransform` and apply OR operation.
                 // Add a data transformation spec so that the fetcher can properly sample datasets
                 // filter: (firstResolvedSpec as any).dataTransform?.filter((f: DataTransform) => f.type === 'filter')
@@ -262,16 +276,17 @@ export function goslingToHiGlass(
                         layout: firstResolvedSpec.layout,
                         innerRadius:
                             channel.axis === 'top'
-                                ? (firstResolvedSpec.outerRadius as number) - HIGLASS_AXIS_SIZE
+                                ? (firstResolvedSpec.outerRadius as number) - TIME_AXIS_SIZE
                                 : firstResolvedSpec.innerRadius,
                         outerRadius:
                             channel.axis === 'top'
                                 ? firstResolvedSpec.outerRadius
-                                : (firstResolvedSpec.innerRadius as number) + HIGLASS_AXIS_SIZE,
+                                : (firstResolvedSpec.innerRadius as number) + TIME_AXIS_SIZE,
                         width: firstResolvedSpec.width,
                         height: firstResolvedSpec.height,
                         startAngle: firstResolvedSpec.startAngle,
                         endAngle: firstResolvedSpec.endAngle,
+                        timeCoordinates: getTrackTimeCoordinates(firstResolvedSpec)?.system ?? ABSOLUTE_TIME,
                         theme
                     });
                 } else {

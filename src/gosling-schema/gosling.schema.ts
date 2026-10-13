@@ -86,7 +86,11 @@ export type Orientation = 'horizontal' | 'vertical';
 /** Custom chromosome sizes, e.g., [["foo", 1000], ["bar", 300], ["baz", 240]] */
 export type ChromSizes = [string, number][];
 export type Assembly = 'hg38' | 'hg19' | 'hg18' | 'hg17' | 'hg16' | 'mm10' | 'mm9' | 'unknown' | ChromSizes;
-export type ZoomLimits = [number | null, number | null];
+/**
+ * The smallest and largest visible span of the x-axis, in x units (base pairs, or seconds on a temporal axis).
+ * On a temporal axis, a span can also be a duration such as `"1 hour"` or `"20 years"`.
+ */
+export type ZoomLimits = [number | Duration | null, number | Duration | null];
 
 export interface CommonViewDef {
     /** The ID of a view that is maintained for the use of JS API functions, e.g., positions of a view */
@@ -123,8 +127,9 @@ export interface CommonViewDef {
      */
     assembly?: Assembly;
 
-    /** Specify the visible region of genomic x-axis */
-    xDomain?: DomainInterval | DomainChrInterval | DomainChr;
+    /** Specify the visible region of the x-axis: a genomic region, or a time interval on a temporal axis
+     * (`{ interval: [start, end] }` with Unix seconds or date strings, e.g. `["2000-01", "2010-12"]`) */
+    xDomain?: DomainInterval | DomainChrInterval | DomainChr | TimeInterval;
 
     /** Specify the visible region of genomic y-axis */
     yDomain?: DomainInterval | DomainChrInterval | DomainChr;
@@ -141,6 +146,13 @@ export interface CommonViewDef {
      * @Range [0, 1]
      */
     centerRadius?: number;
+
+    /**
+     * Whether circular tracks run clockwise from 12 o'clock (`true`) or anticlockwise (`false`).
+     *
+     * __Default:__ `true` for tracks with a temporal `x` channel, otherwise `false`
+     */
+    clockwise?: boolean;
 
     /**
      * Define the [style](http://gosling-lang.org/docs/visual-channel#style-related-properties) of multive views.
@@ -189,6 +201,12 @@ export interface CommonTrackDef extends CommonViewDef {
      * Specify the end angle (in the range of [0, 360]) of circular tracks (`{"layout": "circular"}`).
      */
     endAngle?: number; // [0, 360]
+    /**
+     * Whether circular tracks run clockwise from 12 o'clock (`true`) or anticlockwise (`false`).
+     *
+     * __Default:__ `true` for tracks with a temporal `x` channel, otherwise `false`
+     */
+    clockwise?: boolean;
 
     // Internally used properties
     /** internal */
@@ -580,6 +598,12 @@ export interface Style {
      * If defined, show legend title on the top or left
      */
     legendTitle?: string;
+    /**
+     * Label of this track in the legend, for a track with a constant `color` (e.g. one of several overlaid lines,
+     * areas or bars): the legend shows the label next to a swatch of the track's mark and color. Drawn in the
+     * header legend of linear tracks on a temporal axis.
+     */
+    legendLabel?: string;
 
     // below options could instead be used with channel options (e.g., size, stroke, strokeWidth)
     /**
@@ -689,9 +713,11 @@ export interface ZoomLevelVisibilityCondition extends CommonVisibilityCondition 
      */
     measure: 'zoomLevel';
     /**
-     * Set a threshold in the unit of base pairs (bp)
+     * Set a threshold for the visible span of the x-axis, in its unit: base pairs (bp) on a genomic axis,
+     * seconds on a temporal axis (e.g., `86400` is one day of visible time). On a temporal axis the threshold
+     * can also be a duration such as `"3 months"`.
      */
-    threshold: number;
+    threshold: number | Duration;
 }
 
 export type LogicalOperation =
@@ -755,12 +781,133 @@ export interface AxisCommon {
     grid?: boolean;
 }
 
-export interface X extends AxisCommon {
+export interface X extends Omit<AxisCommon, 'domain'> {
     type?: 'genomic' | 'temporal';
     domain?: GenomicDomain | TemporalDomain;
+    /**
+     * Wrap a temporal axis by a calendar period, which sets the axis' time coordinate system to `period`:
+     * each time is placed at its position within its period (its month, day and time for a year; its weekday and
+     * time for a week; its time of day for a day), so all periods share one axis, or one revolution in a circular
+     * layout. The axis labels positions within the period (Jan...Dec, W1...W53, Mon...Sun, 00:00...23:00).
+     * Each row also gets the period it belongs to as a field (`newField`, e.g. `"2010"`), to be encoded with
+     * `color` (overlaid periods) or `row` (one ring per period).
+     *
+     * Only for `type: "temporal"` on `x`. The domain is always the whole period: a `domain` is ignored.
+     */
+    period?: PeriodUnit | Period;
+    /**
+     * Show time by calendar unit ("show by month"): every row is placed at the start of the unit that contains
+     * its time (for `bar` and `rect` marks without `xe`, each mark spans its unit). If another channel of the
+     * track has an `aggregate`, rows are grouped by the unit and by the fields of the track's nominal channels
+     * (`color`, `row`, `stroke`, ...), and each aggregated channel is reduced with its operation: one mark per
+     * unit and group.
+     *
+     * With `period`, units are taken in absolute time and must lie within the period (e.g. months of a year).
+     *
+     * __Granularity transition rules:__ a list of rules from fine to coarse, each with the largest visible span
+     * at which it applies (`maxSpan`), switches the unit with zoom: at any zoom level the track is drawn with the
+     * first rule whose `maxSpan` exceeds the visible time span; the last rule has no `maxSpan`. For example,
+     * `[{ "unit": "day", "maxSpan": "3 months" }, { "unit": "month" }]` shows days below 3 months of visible
+     * time and months above. This is shorthand for overlaid copies of the track, each with one unit and
+     * `visibility` conditions on the zoom level.
+     *
+     * Only for `type: "temporal"` on `x`.
+     */
+    timeUnit?: TimeUnit | [TimeUnitRule, ...TimeUnitRule[]];
+    /**
+     * Re-express time as an offset from a reference event, which sets the axis' time coordinate system to
+     * `relative`: each row is placed at its signed offset from the anchor of its group (a fixed date, the group's
+     * first or last record, the time of the group's largest or smallest value of a field, or a date read from the
+     * row itself). The axis labels offsets in `unit` ("-2 wk", "0", "+3 wk"), with 0 at the anchor.
+     *
+     * Set the domain as offsets, e.g. `{ "interval": ["-36 months", "24 months"] }` (durations or seconds).
+     * Only for `type: "temporal"` on `x`; cannot be combined with `period`.
+     */
+    relative?: Relative;
+}
+
+/** The reference event of a relative time axis (`x.relative`). */
+export interface Relative {
+    /**
+     * The reference event (offset 0):
+     * - a date (`"2008-09-15"`) or Unix seconds: the same instant for all rows;
+     * - `"first"` | `"last"`: the earliest or latest time in the row's group;
+     * - `{ "argmax": field }` | `{ "argmin": field }`: the time of the group's largest or smallest value of `field`
+     *   (the earliest one if several rows tie);
+     * - `{ "field": name }`: a per-row reference time in a column (Unix seconds or an ISO date).
+     */
+    anchor: TimeValue | 'first' | 'last' | { argmax: string } | { argmin: string } | { field: string };
+    /**
+     * The groups for `"first"`, `"last"`, `argmax` and `argmin`: field(s), or `{ "period": ... }` to group rows by
+     * the calendar period they fall in (e.g. flu seasons: `{ "period": { "unit": "year", "weekBased": true,
+     * "start": 40, "newField": "season" } }`); the period's `newField` receives each row's period.
+     *
+     * __Default:__ all rows form one group
+     */
+    groupby?: string | string[] | { period: PeriodUnit | Period };
+    /**
+     * Unit of the axis labels ("+3 wk") and of `timeUnit` bins, which count whole units from the anchor.
+     * Units from `month` up are labeled with nominal lengths (a month is 30.44 days).
+     * __Default:__ chosen from the visible span
+     */
+    unit?: TimeUnit;
+    /**
+     * Name of the reference event in the axis title, e.g. `"the season's peak"` gives "weeks from the season's
+     * peak". __Default:__ a description of the anchor (e.g. "the maximum of INF_A", or the date)
+     */
+    label?: string;
+}
+
+/** A granularity transition rule of `x.timeUnit`. */
+export interface TimeUnitRule {
+    /** The unit used by this rule; `"none"` draws the rows as they are (no truncation, no aggregation). */
+    unit: TimeUnit | 'none';
+    /**
+     * The rule applies while the visible span of the x-axis is below this duration (e.g. `"3 months"`) or
+     * number of seconds, and at or above the `maxSpan` of the previous rule. Omitted in the last rule.
+     */
+    maxSpan?: number | Duration;
+}
+
+/** Calendar periods by which a temporal axis can be wrapped. */
+export type PeriodUnit = 'year' | 'month' | 'week' | 'day';
+
+export interface Period {
+    /** The calendar period. */
+    unit: PeriodUnit;
+    /**
+     * Field that receives each row's period, as a string that sorts chronologically: `"2010"` (year),
+     * `"2010/11"` (year with `start`), `"2010-03"` (month), `"2010-W05"` (week), `"2010-03-01"` (day).
+     *
+     * __Default:__ `"<field>_<unit>"`, e.g. `"date_year"`
+     */
+    newField?: string;
+    /**
+     * Use years made of ISO weeks (only for `unit: "year"`): a time is placed by its ISO week and weekday,
+     * so ISO week 1 is always at the start of the period, even when it begins in late December, and the
+     * period of a row is its ISO week-year. Years without a week 53 leave the last week empty.
+     *
+     * __Default:__ `false`
+     */
+    weekBased?: boolean;
+    /**
+     * Where each period begins: a month (1-12) for calendar years (e.g. `8` for August-July seasons), an ISO
+     * week (1-52) for week-based years (e.g. `40` for flu seasons), a weekday (1 = Monday ... 7 = Sunday) for
+     * weeks, an hour (0-23) for days. Not supported for months.
+     *
+     * __Default:__ the first month, week, weekday (Monday) or hour (0)
+     */
+    start?: number;
 }
 
 export interface Y extends AxisCommon {
+    /** Specify the data type. A `temporal` axis is only supported on `x`. */
+    type?: 'quantitative' | 'nominal' | 'genomic';
+    /**
+     * Title of the y axis, with units, e.g. `"Consumption (Wh)"`. Drawn above the axis ("↑ Consumption (Wh)")
+     * in the header strip of linear tracks on a temporal axis, and in the center of a ring in circular layouts.
+     */
+    title?: string;
     /** Custom baseline of the y-axis. __Default__: `0` */
     baseline?: string | number;
     /** Specify whether to use zero baseline. __Default__: `true`  */
@@ -879,11 +1026,48 @@ export interface DomainInterval {
 }
 
 export interface TimeInterval {
-    /** Show a certain interval within entire chromosome */
-    interval: [number, number]; // This is consistent to HiGlass's initXDomain and initYDomain.
+    /**
+     * Show a certain time interval, as `[start, end]`. Each bound is Unix epoch seconds or a date string:
+     * a partial date (`"2010"`, `"2010-12"`, `"2010-12-31"`, `"2010-Q4"`, `"2015-W53"`) starts at the first
+     * instant of the unit it names and, as the end, includes the whole unit (`["2000-01", "2010-12"]` covers
+     * January 2000 through December 2010); a date-time (`"2010-01-03T23:00:00Z"`) is that exact instant,
+     * read as UTC without a zone.
+     */
+    interval: [TimeValue, TimeValue];
 }
 
-export type Aggregate = 'max' | 'min' | 'mean' | 'bin' | 'count';
+/** A time: Unix epoch seconds, or a date string such as `"2010-12"` or `"2010-01-03T23:00:00Z"` (UTC). */
+export type TimeValue = number | string;
+
+/**
+ * A length of time: `<number> <unit>`, e.g. `"90 minutes"`, `"2 weeks"`, `"3 months"`, or with a short unit
+ * (`ms`, `s`, `min`, `h`, `d`, `wk`, `mo`, `q`, `y`, `dec`). Units up to a week are exact; a month is 30.436875
+ * days (1/12 of a mean Gregorian year), a quarter 3 months, a year 365.2425 days, a decade 10 years.
+ * @pattern ^\s*[+-]?(\d+(\.\d+)?|\.\d+)\s*[a-zA-Z]+\s*$
+ */
+export type Duration = string;
+
+/**
+ * The calendar granularity hierarchy, all in UTC. `week` is the ISO week (Monday to Sunday);
+ * quarters start in January, April, July and October; decades start in years divisible by 10.
+ */
+export type TimeUnit =
+    | 'millisecond'
+    | 'second'
+    | 'minute'
+    | 'hour'
+    | 'day'
+    | 'week'
+    | 'month'
+    | 'quarter'
+    | 'year'
+    | 'decade';
+
+/**
+ * How to aggregate a channel. With `x.timeUnit`, `count`, `sum`, `mean`, `median`, `min` and `max` reduce the rows
+ * of each time unit and group; without it, the experimental aggregation supports `min` and `max` by one nominal field.
+ */
+export type Aggregate = 'max' | 'min' | 'mean' | 'median' | 'sum' | 'bin' | 'count';
 export type BinAggregate = 'mean' | 'sum';
 
 /* ----------------------------- DATA ----------------------------- */
@@ -939,7 +1123,8 @@ export interface JsonData {
 }
 
 /**
- * The JSON data format allows users to include data directly in the Gosling's JSON specification.
+ * Temporal data in JSON, loaded from `url` or given inline in `values`.
+ * Time fields are converted to Unix epoch seconds, the coordinates of a temporal axis.
  */
 export interface JsonTimeData {
     /**
@@ -947,40 +1132,80 @@ export interface JsonTimeData {
      */
     type: 'json-time';
 
+    /** URL of a JSON file with an array of rows (alternative to `values`). */
     url?: string;
 
     /** Values in the form of JSON. */
     values?: Datum[];
 
-    /** Specify the number of rows loaded from the URL.
+    /** Opt-in random sampling: the maximum number of rows per tile. When a tile has more rows,
+     * a random sample of this size is drawn, so some rows are not shown.
      *
-     * __Default:__ `1000`
+     * __Default:__ no sampling (all rows are shown)
      */
     sampleLength?: number;
+    /** Fields with dates, converted to Unix seconds and stored in the first field. One field holds a date or
+     * date-time string (e.g., `2012-01-31`, `2012-01-31T08:00:00Z`, or a year); several fields are date components
+     * named `year`, `month`, `day`, `hour`, `minute`, `second`. Date-times without a time zone are read as UTC. */
     dateFields?: string[];
+    /** Field with Unix timestamps (see `timestampUnit`). */
     timestampField?: string;
+    /** Unit of the Unix timestamps in `timestampField`: seconds (`"s"`) or milliseconds (`"ms"`).
+     *
+     * __Default:__ `"s"`
+     */
+    timestampUnit?: TimestampUnit;
 }
 
+/** Unit of Unix timestamps: seconds or milliseconds. */
+export type TimestampUnit = 's' | 'ms';
+
+/**
+ * Temporal data in a CSV (or other delimiter-separated) file.
+ * Time fields are converted to Unix epoch seconds, the coordinates of a temporal axis.
+ */
 export interface CSVTimeData {
     /**
      * Define data type.
      */
     type: 'csv-time';
 
+    /** URL of the CSV file. */
     url: string;
+    /** Field separator. __Default:__ `","` */
     separator?: string;
 
-    /** Specify the number of rows loaded from the URL.
+    /** Opt-in random sampling: the maximum number of rows per tile. When a tile has more rows,
+     * a random sample of this size is drawn, so some rows are not shown.
      *
-     * __Default:__ `1000`
+     * __Default:__ no sampling (all rows are shown)
      */
     sampleLength?: number;
+    /** Fields with dates, converted to Unix seconds and stored in the first field:
+     * - one field: a date or date-time string (e.g., `2012-01-31`, `01/31/2012`, `31.01.2012`, `2012-01-31 16:40:21`);
+     * - two fields: a date and a time of day (`HH:MM:SS`), or a year and a calendar week (with `includesCalendarWeek`);
+     * - three or more fields: date components named `year`, `month`, `day`, `hour`, `minute`, `second`.
+     *
+     * Date-times without a time zone are read as UTC. Unparseable dates are not drawn and log a warning. */
     dateFields?: string[];
+    /** Read ambiguous dates as day-month-year (e.g., `01.02.2012` is 1 February). The order is otherwise detected:
+     * a four-digit first part is year-month-day, a first part above 12 is day-first, anything else is month-day-year. */
     dayFirstDate?: boolean;
+    /** Read dates as year-month-day. */
     yearFirstDate?: boolean;
+    /** With two `dateFields`, read the second one as a calendar week of the year in the first one. */
     includesCalendarWeek?: boolean;
+    /** Start and end fields of an interval (e.g., `["pickup", "dropoff"]`), each converted to Unix seconds:
+     * numbers as Unix timestamps (see `timestampUnit`), anything else as a date. Encode them with `x` and `xe`. */
     interval?: string[];
+    /** Field with Unix timestamps (see `timestampUnit`). */
     timestampField?: string;
+    /** Unit of the Unix timestamps in `timestampField` and in numeric `interval` columns:
+     * seconds (`"s"`) or milliseconds (`"ms"`).
+     *
+     * __Default:__ `"s"`
+     */
+    timestampUnit?: TimestampUnit;
 }
 
 
@@ -1307,6 +1532,8 @@ export interface MatrixData {
 export type DataTransform =
     | FilterTransform
     | IntervalTransform
+    | TimeUnitTransform
+    | SpanTransform
     | StrConcatTransform
     | StrReplaceTransform
     | LogTransform
@@ -1318,14 +1545,58 @@ export type DataTransform =
     | JsonParseTransform;
 
 export type FilterTransform = OneOfFilter | RangeFilter | IncludeFilter;
+/**
+ * Add the start of the following year to the last row of each year, so that yearly intervals can be drawn with
+ * `x` (`transformedDateField`) and `xe` (`newField`). Rows are sorted by `yearField` and `weekField`.
+ */
 export interface IntervalTransform {
     type: 'interval';
+    /** Required but currently unused. */
     field: string;
+    /** Field with the year of a row. */
     yearField: string;
+    /** Field with the calendar week of a row. */
     weekField: string;
+    /** Field with the converted date (Unix seconds) of a row. */
     transformedDateField: string;
+    /** Field that receives the start date of the following year. */
     newField: string;
 } ;
+
+/**
+ * Truncate a time field (Unix seconds) to the start of the calendar unit that contains it (UTC), e.g. the first
+ * instant of its month. Rows are kept; to aggregate by unit, use `x.timeUnit` with an `aggregate` channel.
+ */
+export interface TimeUnitTransform {
+    type: 'timeUnit';
+    /** Field with times in Unix seconds, e.g. a `dateFields` field of `csv-time` or `json-time` data. */
+    field: string;
+    /** The calendar unit. `week` is the ISO week (Monday to Sunday). */
+    unit: TimeUnit;
+    /** Field that receives the start of the unit. __Default:__ `field` itself */
+    newField?: string;
+    /** If specified, a field that receives the end of the unit (the start of the next one), e.g. for `xe`. */
+    endField?: string;
+}
+
+/**
+ * Turn a span (a duration without a position in time) into an interval: the end of each row is its start
+ * (`field`) plus a duration, either a numeric field in `unit` or a fixed duration such as `"2 weeks"`.
+ * Units up to a week are added exactly; months, quarters, years and decades are added on the calendar
+ * (31 January + 1 month = the last day of February), with any fraction at the nominal length.
+ * Encode the start with `x` and the end with `xe`. Negative durations are not drawn.
+ */
+export interface SpanTransform {
+    type: 'span';
+    /** Field with the start times (Unix seconds). */
+    field: string;
+    /** A numeric field with each row's duration in `unit`, or a fixed duration such as `"15 minutes"`. */
+    duration: string;
+    /** Unit of a numeric duration field. __Default:__ `"second"` */
+    unit?: TimeUnit;
+    /** Field that receives the end times (Unix seconds). */
+    newField: string;
+}
 
 interface CommonFilterTransform {
     type: 'filter';

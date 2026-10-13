@@ -55,6 +55,24 @@ import JS_SPEC_ISLANDVIEWER from './spec/islandviewer?raw';
 import { spec as JSON_SPEC_ISLANDVIEWER } from './spec/islandviewer';
 import { EX_SPEC_TEMPORAL_OVERVIEW_DETAIL } from './json-spec/temporal-data_overview-detail';
 import { EX_SPEC_TEMPORAL_SEATTLE_WEATHER } from './spec/temporal-data_seattle-weather';
+import { EX_SPEC_TEMPORAL_UNEMPLOYMENT_CIRCULAR_LINEAR } from './spec/temporal-data_unemployment-circular-linear';
+import { EX_SPEC_TEMPORAL_SUPP_UNEMPLOYMENT } from './spec/temporal-data_supp-unemployment';
+import { EX_SPEC_TEMPORAL_SUPP_SEATTLE_WEATHER } from './spec/temporal-data_supp-seattle-weather';
+import { EX_SPEC_TEMPORAL_SUPP_SOLAR_WEATHER } from './spec/temporal-data_supp-solar-weather';
+import { EX_SPEC_TEMPORAL_SUPP_NYC_TAXI } from './spec/temporal-data_supp-nyc-taxi';
+import { EX_SPEC_TEMPORAL_SUPP_WHO_FLU } from './spec/temporal-data_supp-who-flu';
+import { EX_SPEC_TEMPORAL_SUPP_FITBIT } from './spec/temporal-data_supp-fitbit';
+import { EX_SPEC_TEMPORAL_WHO_FLU_PERIOD } from './spec/temporal-data_who-flu-period';
+import { EX_SPEC_TEMPORAL_FITBIT_CYCLES } from './spec/temporal-data_fitbit-cycles';
+import { EX_SPEC_TEMPORAL_UNEMPLOYMENT_GRANULARITY } from './spec/temporal-data_unemployment-granularity';
+import { EX_SPEC_TEMPORAL_RELATIVE_ALIGNMENT } from './spec/temporal-data_relative-alignment';
+import { EX_SPEC_TEMPORAL_TAXI_SPANS } from './spec/temporal-data_taxi-spans';
+import { EX_SPEC_TEMPORAL_CMAPSS_ALIGNMENT } from './spec/temporal-data_cmapss-alignment';
+import { EX_SPEC_TEMPORAL_CMAPSS_PROGNOSIS } from './spec/temporal-data_cmapss-prognosis';
+import { EX_SPEC_TEMPORAL_CMAPSS_FAULT_MODES } from './spec/temporal-data_cmapss-fault-modes';
+import { EX_SPEC_TEMPORAL_CMAPSS_SENSORS } from './spec/temporal-data_cmapss-sensors';
+import { EX_SPEC_TEMPORAL_CMAPSS_CONDITIONS } from './spec/temporal-data_cmapss-conditions';
+import { EX_SPEC_TEMPORAL_CHRO_RING } from './spec/temporal-data_chro-ring';
 
 export type ExampleGroup =
     | 'Visual Encoding'
@@ -511,13 +529,141 @@ const editorExampleObj: {
         group: 'Temporal Data',
         name: 'Unemployment - Overview + Detail',
         spec: EX_SPEC_TEMPORAL_OVERVIEW_DETAIL,
-        underDevelopment: true
+        underDevelopment: true,
+        image: THUMBNAILS.TEMPORAL_DATA_OVERVIEW_DETAIL
     },
     TEMPORAL_DATA_SEATTLE_WEATHER: {
         group: 'Temporal Data',
         name: 'Seattle Weather',
         spec: EX_SPEC_TEMPORAL_SEATTLE_WEATHER,
-        underDevelopment: true
+        underDevelopment: true,
+        image: THUMBNAILS.TEMPORAL_DATA_SEATTLE_WEATHER
+    },
+    TEMPORAL_DATA_UNEMPLOYMENT_CIRCULAR_LINEAR: {
+        group: 'Temporal Data',
+        name: 'Unemployment: Circular Overview + Linear Detail',
+        spec: EX_SPEC_TEMPORAL_UNEMPLOYMENT_CIRCULAR_LINEAR,
+        underDevelopment: true,
+        image: THUMBNAILS.TEMPORAL_DATA_UNEMPLOYMENT_CIRCULAR_LINEAR
+    },
+    TEMPORAL_DATA_SUPP_UNEMPLOYMENT: {
+        group: 'Temporal Data',
+        name: 'Supp. S3: U.S. Unemployment Across Industries',
+        spec: EX_SPEC_TEMPORAL_SUPP_UNEMPLOYMENT,
+        underDevelopment: true,
+        image: THUMBNAILS.TEMPORAL_DATA_SUPP_UNEMPLOYMENT
+    },
+    TEMPORAL_DATA_SUPP_SEATTLE_WEATHER: {
+        group: 'Temporal Data',
+        name: 'Supp. S4: Seattle Weather',
+        spec: EX_SPEC_TEMPORAL_SUPP_SEATTLE_WEATHER,
+        underDevelopment: true,
+        image: THUMBNAILS.TEMPORAL_DATA_SUPP_SEATTLE_WEATHER
+    },
+    TEMPORAL_DATA_SUPP_SOLAR_WEATHER: {
+        group: 'Temporal Data',
+        name: 'Supp. S5: Solar Power and Local Weather',
+        spec: EX_SPEC_TEMPORAL_SUPP_SOLAR_WEATHER,
+        underDevelopment: true,
+        image: THUMBNAILS.TEMPORAL_DATA_SUPP_SOLAR_WEATHER
+    },
+    TEMPORAL_DATA_SUPP_NYC_TAXI: {
+        group: 'Temporal Data',
+        name: 'Supp. S6: NYC Taxi Trip Duration',
+        spec: EX_SPEC_TEMPORAL_SUPP_NYC_TAXI,
+        underDevelopment: true,
+        image: THUMBNAILS.TEMPORAL_DATA_SUPP_NYC_TAXI
+    },
+    TEMPORAL_DATA_SUPP_WHO_FLU: {
+        group: 'Temporal Data',
+        name: 'Supp. S7: WHO Flu Data',
+        spec: EX_SPEC_TEMPORAL_SUPP_WHO_FLU,
+        underDevelopment: true,
+        image: THUMBNAILS.TEMPORAL_DATA_SUPP_WHO_FLU
+    },
+    TEMPORAL_DATA_SUPP_FITBIT: {
+        group: 'Temporal Data',
+        name: 'Supp. S8: FitBit Activity and Heart Rate',
+        spec: EX_SPEC_TEMPORAL_SUPP_FITBIT,
+        underDevelopment: true,
+        image: THUMBNAILS.TEMPORAL_DATA_SUPP_FITBIT
+    },
+    TEMPORAL_DATA_WHO_FLU_PERIOD: {
+        group: 'Temporal Data',
+        name: 'Period: WHO Flu by Week of the Year',
+        spec: EX_SPEC_TEMPORAL_WHO_FLU_PERIOD,
+        underDevelopment: true,
+        image: THUMBNAILS.TEMPORAL_DATA_WHO_FLU_PERIOD
+    },
+    TEMPORAL_DATA_FITBIT_CYCLES: {
+        group: 'Temporal Data',
+        name: 'Period: FitBit Weekly and Daily Cycles',
+        spec: EX_SPEC_TEMPORAL_FITBIT_CYCLES,
+        underDevelopment: true,
+        image: THUMBNAILS.TEMPORAL_DATA_FITBIT_CYCLES
+    },
+    TEMPORAL_DATA_UNEMPLOYMENT_GRANULARITY: {
+        group: 'Temporal Data',
+        name: 'Granularity: Unemployment by Month or Year (zoom)',
+        spec: EX_SPEC_TEMPORAL_UNEMPLOYMENT_GRANULARITY,
+        underDevelopment: true,
+        image: THUMBNAILS.TEMPORAL_DATA_UNEMPLOYMENT_GRANULARITY
+    },
+    TEMPORAL_DATA_RELATIVE_ALIGNMENT: {
+        group: 'Temporal Data',
+        name: 'Relative: Flu Seasons and Unemployment Aligned to Events',
+        spec: EX_SPEC_TEMPORAL_RELATIVE_ALIGNMENT,
+        underDevelopment: true,
+        image: THUMBNAILS.TEMPORAL_DATA_RELATIVE_ALIGNMENT
+    },
+    TEMPORAL_DATA_TAXI_SPANS: {
+        group: 'Temporal Data',
+        name: 'Spans: NYC Taxi Trips and the Daily Cycle',
+        spec: EX_SPEC_TEMPORAL_TAXI_SPANS,
+        underDevelopment: true,
+        image: THUMBNAILS.TEMPORAL_DATA_TAXI_SPANS
+    },
+    TEMPORAL_DATA_CMAPSS_ALIGNMENT: {
+        group: 'Temporal Data',
+        name: 'Relative: Jet Engines Aligned to Entry into Service or to Failure',
+        spec: EX_SPEC_TEMPORAL_CMAPSS_ALIGNMENT,
+        underDevelopment: true,
+        image: THUMBNAILS.TEMPORAL_DATA_CMAPSS_ALIGNMENT
+    },
+    TEMPORAL_DATA_CMAPSS_PROGNOSIS: {
+        group: 'Temporal Data',
+        name: 'Relative: Jet Engine Prognosis, Aligned to an Unobserved Failure',
+        spec: EX_SPEC_TEMPORAL_CMAPSS_PROGNOSIS,
+        underDevelopment: true,
+        image: THUMBNAILS.TEMPORAL_DATA_CMAPSS_PROGNOSIS
+    },
+    TEMPORAL_DATA_CMAPSS_FAULT_MODES: {
+        group: 'Temporal Data',
+        name: 'Relative: Jet Engine Fault Modes, Aligned to Failure',
+        spec: EX_SPEC_TEMPORAL_CMAPSS_FAULT_MODES,
+        underDevelopment: true,
+        image: THUMBNAILS.TEMPORAL_DATA_CMAPSS_FAULT_MODES
+    },
+    TEMPORAL_DATA_CMAPSS_SENSORS: {
+        group: 'Temporal Data',
+        name: 'Granularity: Jet Engine Sensors before Failure (zoom)',
+        spec: EX_SPEC_TEMPORAL_CMAPSS_SENSORS,
+        underDevelopment: true,
+        image: THUMBNAILS.TEMPORAL_DATA_CMAPSS_SENSORS
+    },
+    TEMPORAL_DATA_CMAPSS_CONDITIONS: {
+        group: 'Temporal Data',
+        name: 'Relative: Jet Engine Sensor Normalized by Flight Condition',
+        spec: EX_SPEC_TEMPORAL_CMAPSS_CONDITIONS,
+        underDevelopment: true,
+        image: THUMBNAILS.TEMPORAL_DATA_CMAPSS_CONDITIONS
+    },
+    TEMPORAL_DATA_CHRO_RING: {
+        group: 'Temporal Data',
+        name: 'Chro-Ring: the Life of Su Shi (simulated)',
+        spec: EX_SPEC_TEMPORAL_CHRO_RING,
+        underDevelopment: true,
+        image: THUMBNAILS.TEMPORAL_DATA_CHRO_RING
     }
 };
 

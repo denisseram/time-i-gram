@@ -39,7 +39,8 @@ const y = {
 
 export const EX_SPEC_TEMPORAL_UNEMPLOYMENT_CIRCULAR_LINEAR: GoslingSpec = {
     title: 'Does unemployment follow a yearly cycle in every industry?',
-    subtitle: 'Five industries, 2000 to 2010. Brush the ring to zoom the detail. Source: U.S. Bureau of Labor Statistics',
+    subtitle:
+        'Five industries, 2000 to 2010. Brush the ring to zoom the detail. Source: U.S. Bureau of Labor Statistics',
     arrangement: 'horizontal',
     views: [
         {
@@ -53,8 +54,11 @@ export const EX_SPEC_TEMPORAL_UNEMPLOYMENT_CIRCULAR_LINEAR: GoslingSpec = {
                     dataTransform,
                     mark: 'line',
                     x: { field: 'date', type: 'temporal', domain: xDomain },
-                    y,
-                    color,
+                    // no radial axis: its tick "2000" (thousands) stood next to the year 2000 at 12 o'clock;
+                    // the ring uses the y scale of the detail view, as its center title says
+                    y: { ...y, axis: 'none', title: 'Unemployed (thousands), scale of the detail' },
+                    // the legend is in the detail's header (same colors); on the ring it would cover a year label
+                    color: { ...color, legend: false },
                     tracks: [
                         {},
                         {
@@ -75,7 +79,13 @@ export const EX_SPEC_TEMPORAL_UNEMPLOYMENT_CIRCULAR_LINEAR: GoslingSpec = {
                     data,
                     dataTransform,
                     mark: 'line',
-                    x: { field: 'date', type: 'temporal', axis: 'bottom', linkingId: 'unemployment-brush', domain: xDomain },
+                    x: {
+                        field: 'date',
+                        type: 'temporal',
+                        axis: 'bottom',
+                        linkingId: 'unemployment-brush',
+                        domain: xDomain
+                    },
                     y,
                     color,
                     width: 700,

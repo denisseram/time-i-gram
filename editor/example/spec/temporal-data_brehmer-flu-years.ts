@@ -1,5 +1,5 @@
 import type { GoslingSpec } from '@gosling-lang/gosling-schema';
-import { SINGLE } from './palette';
+import { yearColors } from './palette';
 
 // Brehmer et al. (2017) design #3: linear representation x chronological scale x segmented layout.
 // The time axis is cut into ISO week-based years (`period: { unit: "year", weekBased: true }`) and every year is
@@ -33,9 +33,16 @@ const spec = {
             },
             y: { field: 'INF_A', type: 'quantitative', domain: [0, 14000], axis: 'left', title: 'Cases per week' },
             row: { field: 'year', type: 'nominal', domain: YEARS, legend: true },
-            color: { value: SINGLE },
-            stroke: { value: SINGLE },
-            strokeWidth: { value: 1 },
+            // each year in its own color, the color of the season that starts in it (as in the other WHO examples)
+            color: {
+                field: 'year',
+                type: 'nominal',
+                domain: YEARS,
+                range: yearColors(YEARS),
+                legend: true,
+                title: 'ISO year'
+            },
+            strokeWidth: { value: 0 },
             width: 900,
             height: 700
         }

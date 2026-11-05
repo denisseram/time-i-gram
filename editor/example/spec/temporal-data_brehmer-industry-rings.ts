@@ -1,5 +1,5 @@
 import type { GoslingSpec } from '@gosling-lang/gosling-schema';
-import { SINGLE } from './palette';
+import { OKABE_ITO } from './palette';
 
 // Brehmer et al. (2017) design #11: radial representation x chronological scale x faceted layout.
 // One revolution is the whole decade in absolute time (January 2000 to February 2010), and every industry is a
@@ -53,8 +53,9 @@ const spec = {
             tracks: [
                 {
                     mark: 'area',
-                    color: { value: SINGLE },
-                    stroke: { value: SINGLE },
+                    // one color for the 14 industries (more than the palette has); bluish green, not the blue of B3's neighbours
+                    color: { value: OKABE_ITO.bluishGreen },
+                    stroke: { value: OKABE_ITO.bluishGreen },
                     strokeWidth: { value: 0.5 }
                 },
                 {

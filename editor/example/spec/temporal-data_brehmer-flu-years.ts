@@ -7,7 +7,7 @@ import type { GoslingSpec } from '@gosling-lang/gosling-schema';
 // examples, read unchanged). The file holds ISO years 2010 to 2014 and the first week of 2015.
 
 const FLU = {
-    url: 'https://raw.githubusercontent.com/vanessastoiber/thesis-datasets/main/5_who-flu/who_flu_usa.csv',
+    url: 'https://raw.githubusercontent.com/vanessastoiber/thesis-datasets/44333d134c2aa1faf1503f2af29a8ae4d5f738e4/5_who-flu/who_flu_usa.csv',
     type: 'csv-time',
     // the Monday of each ISO week is stored in the first field (see the period example)
     dateFields: ['ISO_YEAR', 'ISO_WEEK'],

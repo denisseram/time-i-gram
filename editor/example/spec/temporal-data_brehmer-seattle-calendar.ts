@@ -9,7 +9,7 @@ import type { GoslingSpec } from '@gosling-lang/gosling-schema';
 // The header strip (title, legend) covers the first row of a track, so the rows start with an empty category.
 
 const WEATHER = {
-    url: 'https://raw.githubusercontent.com/vega/vega-datasets/main/data/seattle-weather.csv',
+    url: 'https://raw.githubusercontent.com/vega/vega-datasets/v3.3.1/data/seattle-weather.csv',
     type: 'csv-time',
     dateFields: ['date']
 } as const;

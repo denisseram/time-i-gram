@@ -12,7 +12,7 @@ import type { GoslingSpec } from '@gosling-lang/gosling-schema';
 // largest count (2014-W52) is close to the end of the file.
 
 const FLU = {
-    url: 'https://raw.githubusercontent.com/vanessastoiber/thesis-datasets/main/5_who-flu/who_flu_usa.csv',
+    url: 'https://raw.githubusercontent.com/vanessastoiber/thesis-datasets/44333d134c2aa1faf1503f2af29a8ae4d5f738e4/5_who-flu/who_flu_usa.csv',
     type: 'csv-time',
     dateFields: ['ISO_YEAR', 'ISO_WEEK'],
     includesCalendarWeek: true

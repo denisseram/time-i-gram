@@ -11,7 +11,7 @@ import type { GoslingSpec } from '@gosling-lang/gosling-schema';
 
 const DATA = {
     type: 'csv-time',
-    url: 'https://raw.githubusercontent.com/vega/vega-datasets/main/data/co2-concentration.csv',
+    url: 'https://raw.githubusercontent.com/vega/vega-datasets/v3.3.1/data/co2-concentration.csv',
     dateFields: ['Date']
 } as const;
 

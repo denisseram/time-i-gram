@@ -9,7 +9,7 @@ import type { GoslingSpec } from '@gosling-lang/gosling-schema';
 // The header strip covers the first row of a track, so the rows start with an empty category.
 
 const DATA = {
-    url: 'https://raw.githubusercontent.com/vega/vega-datasets/main/data/unemployment-across-industries.json',
+    url: 'https://raw.githubusercontent.com/vega/vega-datasets/v3.3.1/data/unemployment-across-industries.json',
     type: 'json-time',
     dateFields: ['date']
 } as const;

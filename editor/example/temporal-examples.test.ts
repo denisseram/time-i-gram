@@ -24,13 +24,24 @@ import { EX_SPEC_TEMPORAL_CHRO_RING } from './spec/temporal-data_chro-ring';
 import { EX_SPEC_TEMPORAL_BEIJING_AIR } from './spec/temporal-data_beijing-air';
 import { EX_SPEC_TEMPORAL_NOVELISTS } from './spec/temporal-data_novelists';
 import { EX_SPEC_TEMPORAL_KEELING_CO2 } from './spec/temporal-data_keeling-co2';
+import { EX_SPEC_TEMPORAL_BREHMER_FLU_YEARS } from './spec/temporal-data_brehmer-flu-years';
+import { EX_SPEC_TEMPORAL_BREHMER_INDUSTRY_RINGS } from './spec/temporal-data_brehmer-industry-rings';
+import { EX_SPEC_TEMPORAL_BREHMER_FLU_SEASON_RINGS } from './spec/temporal-data_brehmer-flu-season-rings';
+import { EX_SPEC_TEMPORAL_BREHMER_SEATTLE_CALENDAR } from './spec/temporal-data_brehmer-seattle-calendar';
 import { TIME_INPUT_DATE_AND_TIME, TIME_INPUT_UNIX_TIMESTAMPS } from './doc-examples/time-input';
 
 /** The JS code blocks of README.md that build a spec, evaluated to the spec object. */
 function readmeSpecs(): Record<string, GoslingSpec> {
     const md = fs.readFileSync(path.resolve(__dirname, '../../README.md'), 'utf8');
-    const running = md.slice(md.indexOf('const DATA_URL'), md.indexOf('embed(document.getElementById("container"), spec);'));
-    const quickStart = md.slice(md.indexOf("const spec = {\n  title: 'Seattle Weather'"), md.indexOf('function App()'));
+    const running = md.slice(
+        md.indexOf('const DATA_URL'),
+        md.indexOf('embed(document.getElementById("container"), spec);')
+    );
+    const quickStartBegin = md.indexOf("const spec = {\n      title: 'Seattle Weather'");
+    const quickStart = md.slice(
+        quickStartBegin,
+        md.indexOf("embed(document.getElementById('container'), spec);", quickStartBegin)
+    );
     return {
         'README running example': new Function(`${running}; return spec;`)(),
         'README quick start': new Function(`${quickStart}; return spec;`)()
@@ -58,6 +69,10 @@ const examples: Record<string, GoslingSpec> = {
     'calendar: Beijing air': EX_SPEC_TEMPORAL_BEIJING_AIR,
     'relative: novelists': EX_SPEC_TEMPORAL_NOVELISTS,
     'period: Keeling CO2': EX_SPEC_TEMPORAL_KEELING_CO2,
+    'Brehmer #3: flu years': EX_SPEC_TEMPORAL_BREHMER_FLU_YEARS,
+    'Brehmer #11: industry rings': EX_SPEC_TEMPORAL_BREHMER_INDUSTRY_RINGS,
+    'Brehmer #13: flu season rings': EX_SPEC_TEMPORAL_BREHMER_FLU_SEASON_RINGS,
+    'Brehmer #17: Seattle calendar': EX_SPEC_TEMPORAL_BREHMER_SEATTLE_CALENDAR,
     'doc: date and time columns': TIME_INPUT_DATE_AND_TIME,
     'doc: Unix timestamps': TIME_INPUT_UNIX_TIMESTAMPS,
     ...readmeSpecs()
@@ -136,5 +151,72 @@ describe('temporal example "supp S8 FitBit"', () => {
             ['bar', 'Steps (bars)', 'Steps'],
             ['line', 'Very active minutes (line)', 'Very active minutes']
         ]);
+    });
+});
+
+/** Every track of a spec, with the properties inherited from its enclosing views and track groups. */
+function leafTracks(node: any, inherited: any = {}): any[] {
+    const scope = {
+        ...inherited,
+        ...Object.fromEntries(Object.entries(node).filter(([k]) => !['views', 'tracks'].includes(k)))
+    };
+    const children = [...(node.views ?? []), ...(node.tracks ?? [])];
+    return children.length ? children.flatMap(child => leafTracks(child, scope)) : [scope];
+}
+
+describe('Brehmer et al. (2017) design cells', () => {
+    const drawn = (spec: GoslingSpec) => leafTracks(spec).filter(t => t.mark !== 'brush');
+
+    it('#3 linear chronological segmented: ISO years as rows of a linear period axis', () => {
+        const [track] = drawn(EX_SPEC_TEMPORAL_BREHMER_FLU_YEARS);
+        expect(track.layout ?? 'linear').toEqual('linear');
+        expect(track.x.period).toEqual({ unit: 'year', weekBased: true, newField: 'year' });
+        expect(track.row.field).toEqual('year');
+    });
+
+    it('#11 radial chronological faceted: absolute time on a ring, one ring per industry', () => {
+        const tracks = drawn(EX_SPEC_TEMPORAL_BREHMER_INDUSTRY_RINGS);
+        tracks.forEach(t => {
+            expect(t.layout).toEqual('circular');
+            expect(t.x.period ?? t.x.relative).toBeUndefined();
+            expect(t.row.field).toEqual('series');
+        });
+    });
+
+    it('#13 radial relative faceted: seasons aligned to their peak, one ring per season', () => {
+        const tracks = drawn(EX_SPEC_TEMPORAL_BREHMER_FLU_SEASON_RINGS);
+        tracks.forEach(t => {
+            expect(t.layout).toEqual('circular');
+            expect(t.x.relative.anchor).toEqual({ argmax: 'INF_A' });
+            expect(t.x.relative.groupby.period).toMatchObject({
+                unit: 'year',
+                weekBased: true,
+                start: 40,
+                newField: 'season'
+            });
+            expect(t.row.field).toEqual('season');
+        });
+    });
+
+    it('#17 calendar: composed from period week, row and timeUnit day, without a calendar layout', () => {
+        const tracks = drawn(EX_SPEC_TEMPORAL_BREHMER_SEATTLE_CALENDAR);
+        tracks.forEach(t => {
+            expect(t.layout ?? 'linear').toEqual('linear');
+            expect(t.x.period).toEqual({ unit: 'week', newField: 'week' });
+            expect(t.x.timeUnit).toEqual('day');
+        });
+        expect(tracks.filter(t => t.row).every(t => t.row.field === 'week')).toBe(true);
+    });
+
+    it('new design-cell examples have a title and no subtitle', () => {
+        [
+            EX_SPEC_TEMPORAL_BREHMER_FLU_YEARS,
+            EX_SPEC_TEMPORAL_BREHMER_INDUSTRY_RINGS,
+            EX_SPEC_TEMPORAL_BREHMER_FLU_SEASON_RINGS,
+            EX_SPEC_TEMPORAL_BREHMER_SEATTLE_CALENDAR
+        ].forEach((spec: any) => {
+            expect(spec.title).toMatch(/\?$/);
+            expect(spec.subtitle).toBeUndefined();
+        });
     });
 });

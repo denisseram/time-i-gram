@@ -29,6 +29,9 @@ import { EX_SPEC_TEMPORAL_BREHMER_INDUSTRY_RINGS } from './spec/temporal-data_br
 import { EX_SPEC_TEMPORAL_BREHMER_FLU_SEASON_RINGS } from './spec/temporal-data_brehmer-flu-season-rings';
 import { EX_SPEC_TEMPORAL_BREHMER_SEATTLE_CALENDAR } from './spec/temporal-data_brehmer-seattle-calendar';
 import { EX_SPEC_TEMPORAL_BREHMER_CO2_DECADE_GRID } from './spec/temporal-data_brehmer-co2-decade-grid';
+import { EX_SPEC_TEMPORAL_TIMEVIZ_CYCLE_PLOT } from './spec/temporal-data_timeviz-cycle-plot';
+import { EX_SPEC_TEMPORAL_TIMEVIZ_LIFELINES2 } from './spec/temporal-data_timeviz-lifelines2';
+import { EX_SPEC_TEMPORAL_TIMEVIZ_SOLARPLOT } from './spec/temporal-data_timeviz-solarplot';
 import { TIME_INPUT_DATE_AND_TIME, TIME_INPUT_UNIX_TIMESTAMPS } from './doc-examples/time-input';
 
 /** The JS code blocks of README.md that build a spec, evaluated to the spec object. */
@@ -75,6 +78,9 @@ const examples: Record<string, GoslingSpec> = {
     'Brehmer #13: flu season rings': EX_SPEC_TEMPORAL_BREHMER_FLU_SEASON_RINGS,
     'Brehmer #17: Seattle calendar': EX_SPEC_TEMPORAL_BREHMER_SEATTLE_CALENDAR,
     'Brehmer #16: CO2 decade grid': EX_SPEC_TEMPORAL_BREHMER_CO2_DECADE_GRID,
+    'TimeViz: cycle plot': EX_SPEC_TEMPORAL_TIMEVIZ_CYCLE_PLOT,
+    'TimeViz: LifeLines2': EX_SPEC_TEMPORAL_TIMEVIZ_LIFELINES2,
+    'TimeViz: SolarPlot': EX_SPEC_TEMPORAL_TIMEVIZ_SOLARPLOT,
     'doc: date and time columns': TIME_INPUT_DATE_AND_TIME,
     'doc: Unix timestamps': TIME_INPUT_UNIX_TIMESTAMPS,
     ...readmeSpecs()
@@ -231,5 +237,34 @@ describe('Brehmer et al. (2017) design cells', () => {
             expect(spec.title).toMatch(/\?$/);
             expect(spec.subtitle).toBeUndefined();
         });
+    });
+});
+
+describe('TimeViz reproductions', () => {
+    const drawn = (spec: GoslingSpec) => leafTracks(spec).filter(t => t.mark !== 'brush');
+
+    it('cycle plot: twelve month panels, all linked, each with a mean rule', () => {
+        const panels = (EX_SPEC_TEMPORAL_TIMEVIZ_CYCLE_PLOT as any).views[0].views;
+        expect(panels).toHaveLength(12);
+        const tracks = drawn(EX_SPEC_TEMPORAL_TIMEVIZ_CYCLE_PLOT).filter(t => t.data && t.width < 1000);
+        expect(
+            tracks.filter(t => t.mark === 'rule').every(t => t.y.aggregate === 'mean' && t.x.linkingId === 'years')
+        ).toBe(true);
+        expect(tracks.filter(t => t.mark === 'line').every(t => t.x.linkingId === 'years')).toBe(true);
+    });
+
+    it('LifeLines2: rows of records aligned to an event of their own, and a histogram on the same axis', () => {
+        const [rows, histogram] = drawn(EX_SPEC_TEMPORAL_TIMEVIZ_LIFELINES2);
+        expect(rows.x.relative.anchor).toEqual({ argmax: 'precipitation' });
+        expect(rows.row.field).toEqual('year');
+        expect(histogram.x.relative).toEqual(rows.x.relative);
+        expect([histogram.x.timeUnit, histogram.y.aggregate]).toEqual(['week', 'count']);
+    });
+
+    it('SolarPlot: counts per bin on a ring, bins that change with zoom', () => {
+        const [ring] = drawn(EX_SPEC_TEMPORAL_TIMEVIZ_SOLARPLOT);
+        expect(ring.layout).toEqual('circular');
+        expect(ring.y.aggregate).toEqual('count');
+        expect(ring.x.timeUnit.map((r: any) => r.unit)).toEqual(['week', 'month']);
     });
 });

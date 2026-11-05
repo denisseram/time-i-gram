@@ -78,6 +78,9 @@ import { EX_SPEC_TEMPORAL_BREHMER_INDUSTRY_RINGS } from './spec/temporal-data_br
 import { EX_SPEC_TEMPORAL_BREHMER_FLU_SEASON_RINGS } from './spec/temporal-data_brehmer-flu-season-rings';
 import { EX_SPEC_TEMPORAL_BREHMER_SEATTLE_CALENDAR } from './spec/temporal-data_brehmer-seattle-calendar';
 import { EX_SPEC_TEMPORAL_BREHMER_CO2_DECADE_GRID } from './spec/temporal-data_brehmer-co2-decade-grid';
+import { EX_SPEC_TEMPORAL_TIMEVIZ_CYCLE_PLOT } from './spec/temporal-data_timeviz-cycle-plot';
+import { EX_SPEC_TEMPORAL_TIMEVIZ_LIFELINES2 } from './spec/temporal-data_timeviz-lifelines2';
+import { EX_SPEC_TEMPORAL_TIMEVIZ_SOLARPLOT } from './spec/temporal-data_timeviz-solarplot';
 
 export type ExampleGroup =
     | 'Visual Encoding'
@@ -770,6 +773,33 @@ const editorExampleObj: {
         spec: EX_SPEC_TEMPORAL_BREHMER_CO2_DECADE_GRID,
         underDevelopment: true,
         image: THUMBNAILS.TEMPORAL_DATA_BREHMER_CO2_DECADE_GRID
+    },
+    TEMPORAL_DATA_TIMEVIZ_CYCLE_PLOT: {
+        group: 'Temporal Data',
+        name: 'TimeViz: Cycle Plot (Cleveland), Construction Unemployment by Month',
+        description:
+            'Cycle plot (Cleveland 1993): twelve juxtaposed views, one per month (filters on a month column), each a line over 2000-2009; the mean as a rule with timeUnit decade + mean. Data: U.S. BLS via vega-datasets',
+        spec: EX_SPEC_TEMPORAL_TIMEVIZ_CYCLE_PLOT,
+        underDevelopment: true,
+        image: THUMBNAILS.TEMPORAL_DATA_TIMEVIZ_CYCLE_PLOT
+    },
+    TEMPORAL_DATA_TIMEVIZ_LIFELINES2: {
+        group: 'Temporal Data',
+        name: 'TimeViz: LifeLines2, Seattle Weather Aligned to the Wettest Day',
+        description:
+            'LifeLines2 (Wang et al. 2009): categorical instant events as triangles, one row per record (year); relative alignment (argmax anchor per year, groupby period); a linked histogram (timeUnit week + count on the relative axis). Data: NOAA via vega-datasets',
+        spec: EX_SPEC_TEMPORAL_TIMEVIZ_LIFELINES2,
+        underDevelopment: true,
+        image: THUMBNAILS.TEMPORAL_DATA_TIMEVIZ_LIFELINES2
+    },
+    TEMPORAL_DATA_TIMEVIZ_SOLARPLOT: {
+        group: 'Temporal Data',
+        name: 'TimeViz: SolarPlot (Chuah), Rainy Days in Seattle',
+        description:
+            'SolarPlot (Chuah 1998): the whole series as one revolution, bins as sunbeams (timeUnit rules week/month + count) that change with zoom; a brush on the ring drives a linear detail. Data: NOAA via vega-datasets',
+        spec: EX_SPEC_TEMPORAL_TIMEVIZ_SOLARPLOT,
+        underDevelopment: true,
+        image: THUMBNAILS.TEMPORAL_DATA_TIMEVIZ_SOLARPLOT
     }
 };
 

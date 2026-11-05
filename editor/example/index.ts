@@ -73,6 +73,10 @@ import { EX_SPEC_TEMPORAL_CHRO_RING } from './spec/temporal-data_chro-ring';
 import { EX_SPEC_TEMPORAL_BEIJING_AIR } from './spec/temporal-data_beijing-air';
 import { EX_SPEC_TEMPORAL_NOVELISTS } from './spec/temporal-data_novelists';
 import { EX_SPEC_TEMPORAL_KEELING_CO2 } from './spec/temporal-data_keeling-co2';
+import { EX_SPEC_TEMPORAL_BREHMER_FLU_YEARS } from './spec/temporal-data_brehmer-flu-years';
+import { EX_SPEC_TEMPORAL_BREHMER_INDUSTRY_RINGS } from './spec/temporal-data_brehmer-industry-rings';
+import { EX_SPEC_TEMPORAL_BREHMER_FLU_SEASON_RINGS } from './spec/temporal-data_brehmer-flu-season-rings';
+import { EX_SPEC_TEMPORAL_BREHMER_SEATTLE_CALENDAR } from './spec/temporal-data_brehmer-seattle-calendar';
 
 export type ExampleGroup =
     | 'Visual Encoding'
@@ -157,14 +161,16 @@ const docExampleObj: {
     doc_time_date_and_time: {
         group: 'Doc',
         name: 'Time Input: Date and Time Columns',
-        description: 'csv-time with dateFields [date, time of day]; timeUnit rules (hour, day) with count; date tooltips',
+        description:
+            'csv-time with dateFields [date, time of day]; timeUnit rules (hour, day) with count; date tooltips',
         spec: docExamples.TIME_INPUT_DATE_AND_TIME,
         hidden: true
     },
     doc_time_unix_timestamps: {
         group: 'Doc',
         name: 'Time Input: Unix Timestamps',
-        description: 'json-time with inline values; timestampField in seconds and in milliseconds (timestampUnit); dates before 1970',
+        description:
+            'json-time with inline values; timestampField in seconds and in milliseconds (timestampUnit); dates before 1970',
         spec: docExamples.TIME_INPUT_UNIX_TIMESTAMPS,
         hidden: true
     },
@@ -718,6 +724,42 @@ const editorExampleObj: {
         spec: EX_SPEC_TEMPORAL_KEELING_CO2,
         underDevelopment: true,
         image: THUMBNAILS.TEMPORAL_DATA_KEELING_CO2
+    },
+    TEMPORAL_DATA_BREHMER_FLU_YEARS: {
+        group: 'Temporal Data',
+        name: 'Brehmer #3: Influenza, One Row per Year',
+        description:
+            'Linear chronological segmented (Brehmer #3): period year with ISO weeks (weekBased); one row per year (row on the period field); ISO year + week columns',
+        spec: EX_SPEC_TEMPORAL_BREHMER_FLU_YEARS,
+        underDevelopment: true,
+        image: THUMBNAILS.TEMPORAL_DATA_BREHMER_FLU_YEARS
+    },
+    TEMPORAL_DATA_BREHMER_INDUSTRY_RINGS: {
+        group: 'Temporal Data',
+        name: 'Brehmer #11: Unemployment, One Ring per Industry',
+        description:
+            'Radial chronological faceted (Brehmer #11): circular layout, absolute time over the decade; one ring per industry (row on a nominal field); date-string domain',
+        spec: EX_SPEC_TEMPORAL_BREHMER_INDUSTRY_RINGS,
+        underDevelopment: true,
+        image: THUMBNAILS.TEMPORAL_DATA_BREHMER_INDUSTRY_RINGS
+    },
+    TEMPORAL_DATA_BREHMER_FLU_SEASON_RINGS: {
+        group: 'Temporal Data',
+        name: 'Brehmer #13: Influenza Seasons Aligned to Their Peak, One Ring Each',
+        description:
+            'Radial relative faceted (Brehmer #13): relative with an argmax anchor per season (groupby period, seasons from ISO week 40) on a circular layout; one ring per season (row on the new field); relative domain in weeks',
+        spec: EX_SPEC_TEMPORAL_BREHMER_FLU_SEASON_RINGS,
+        underDevelopment: true,
+        image: THUMBNAILS.TEMPORAL_DATA_BREHMER_FLU_SEASON_RINGS
+    },
+    TEMPORAL_DATA_BREHMER_SEATTLE_CALENDAR: {
+        group: 'Temporal Data',
+        name: 'Brehmer #17: Seattle Precipitation Calendar',
+        description:
+            'Grid (calendar) chronological segmented (Brehmer #17), composed: period week + row on the period field + timeUnit day with mean on color; a filter on time; date tooltips',
+        spec: EX_SPEC_TEMPORAL_BREHMER_SEATTLE_CALENDAR,
+        underDevelopment: true,
+        image: THUMBNAILS.TEMPORAL_DATA_BREHMER_SEATTLE_CALENDAR
     }
 };
 

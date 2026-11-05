@@ -28,6 +28,7 @@ import { EX_SPEC_TEMPORAL_BREHMER_FLU_YEARS } from './spec/temporal-data_brehmer
 import { EX_SPEC_TEMPORAL_BREHMER_INDUSTRY_RINGS } from './spec/temporal-data_brehmer-industry-rings';
 import { EX_SPEC_TEMPORAL_BREHMER_FLU_SEASON_RINGS } from './spec/temporal-data_brehmer-flu-season-rings';
 import { EX_SPEC_TEMPORAL_BREHMER_SEATTLE_CALENDAR } from './spec/temporal-data_brehmer-seattle-calendar';
+import { EX_SPEC_TEMPORAL_BREHMER_CO2_DECADE_GRID } from './spec/temporal-data_brehmer-co2-decade-grid';
 import { TIME_INPUT_DATE_AND_TIME, TIME_INPUT_UNIX_TIMESTAMPS } from './doc-examples/time-input';
 
 /** The JS code blocks of README.md that build a spec, evaluated to the spec object. */
@@ -73,6 +74,7 @@ const examples: Record<string, GoslingSpec> = {
     'Brehmer #11: industry rings': EX_SPEC_TEMPORAL_BREHMER_INDUSTRY_RINGS,
     'Brehmer #13: flu season rings': EX_SPEC_TEMPORAL_BREHMER_FLU_SEASON_RINGS,
     'Brehmer #17: Seattle calendar': EX_SPEC_TEMPORAL_BREHMER_SEATTLE_CALENDAR,
+    'Brehmer #16: CO2 decade grid': EX_SPEC_TEMPORAL_BREHMER_CO2_DECADE_GRID,
     'doc: date and time columns': TIME_INPUT_DATE_AND_TIME,
     'doc: Unix timestamps': TIME_INPUT_UNIX_TIMESTAMPS,
     ...readmeSpecs()
@@ -198,6 +200,16 @@ describe('Brehmer et al. (2017) design cells', () => {
         });
     });
 
+    it('#16 base-10 grid: composed from period decade, row and timeUnit year', () => {
+        const tracks = drawn(EX_SPEC_TEMPORAL_BREHMER_CO2_DECADE_GRID);
+        tracks.forEach(t => {
+            expect(t.layout ?? 'linear').toEqual('linear');
+            expect(t.x.period).toEqual({ unit: 'decade', newField: 'decade' });
+            expect(t.x.timeUnit).toEqual('year');
+        });
+        expect(tracks.filter(t => t.row).every(t => t.row.field === 'decade')).toBe(true);
+    });
+
     it('#17 calendar: composed from period week, row and timeUnit day, without a calendar layout', () => {
         const tracks = drawn(EX_SPEC_TEMPORAL_BREHMER_SEATTLE_CALENDAR);
         tracks.forEach(t => {
@@ -213,7 +225,8 @@ describe('Brehmer et al. (2017) design cells', () => {
             EX_SPEC_TEMPORAL_BREHMER_FLU_YEARS,
             EX_SPEC_TEMPORAL_BREHMER_INDUSTRY_RINGS,
             EX_SPEC_TEMPORAL_BREHMER_FLU_SEASON_RINGS,
-            EX_SPEC_TEMPORAL_BREHMER_SEATTLE_CALENDAR
+            EX_SPEC_TEMPORAL_BREHMER_SEATTLE_CALENDAR,
+            EX_SPEC_TEMPORAL_BREHMER_CO2_DECADE_GRID
         ].forEach((spec: any) => {
             expect(spec.title).toMatch(/\?$/);
             expect(spec.subtitle).toBeUndefined();

@@ -77,6 +77,7 @@ import { EX_SPEC_TEMPORAL_BREHMER_FLU_YEARS } from './spec/temporal-data_brehmer
 import { EX_SPEC_TEMPORAL_BREHMER_INDUSTRY_RINGS } from './spec/temporal-data_brehmer-industry-rings';
 import { EX_SPEC_TEMPORAL_BREHMER_FLU_SEASON_RINGS } from './spec/temporal-data_brehmer-flu-season-rings';
 import { EX_SPEC_TEMPORAL_BREHMER_SEATTLE_CALENDAR } from './spec/temporal-data_brehmer-seattle-calendar';
+import { EX_SPEC_TEMPORAL_BREHMER_CO2_DECADE_GRID } from './spec/temporal-data_brehmer-co2-decade-grid';
 
 export type ExampleGroup =
     | 'Visual Encoding'
@@ -760,6 +761,15 @@ const editorExampleObj: {
         spec: EX_SPEC_TEMPORAL_BREHMER_SEATTLE_CALENDAR,
         underDevelopment: true,
         image: THUMBNAILS.TEMPORAL_DATA_BREHMER_SEATTLE_CALENDAR
+    },
+    TEMPORAL_DATA_BREHMER_CO2_DECADE_GRID: {
+        group: 'Temporal Data',
+        name: 'Brehmer #16: CO₂, a Grid of Decades and Years',
+        description:
+            'Grid (base-10) chronological segmented (Brehmer #16), composed: period decade + row on the period field + timeUnit year with mean on color; data from 1958',
+        spec: EX_SPEC_TEMPORAL_BREHMER_CO2_DECADE_GRID,
+        underDevelopment: true,
+        image: THUMBNAILS.TEMPORAL_DATA_BREHMER_CO2_DECADE_GRID
     }
 };
 

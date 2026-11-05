@@ -1,4 +1,5 @@
 import type { GoslingSpec } from '@gosling-lang/gosling-schema';
+import { BRUSH, CATEGORICAL, OKABE_ITO, TEMPERATURE_MAX, TEMPERATURE_MIN } from './palette';
 
 // Supplementary material, Fig. S5 (Solar Power Generation and Local Weather; paper Fig. 1B).
 // Copied from the supplementary PDF (a fragment, wrapped in a root object). Fixed since
@@ -36,7 +37,7 @@ const spec = {
                 axis: 'bottom'
             },
             y: { field: 'Gesamt Erzeugung', type: 'quantitative', axis: 'none' },
-            color: { value: '#74c476' },
+            color: { value: OKABE_ITO.bluishGreen },
 
             tracks: [
                 {},
@@ -46,7 +47,7 @@ const spec = {
                         linkingId: '2'
                     },
                     color: {
-                        value: 'steelBlue'
+                        value: BRUSH
                     }
                 }
             ],
@@ -80,7 +81,7 @@ const spec = {
                 {
                     mark: 'area',
                     color: {
-                        value: '#bae4b3'
+                        value: OKABE_ITO.bluishGreen
                     },
                     y: {
                         field: 'Energie ins Netz eingespeist',
@@ -109,7 +110,7 @@ const spec = {
                 {
                     mark: 'area',
                     color: {
-                        value: '#fcae91'
+                        value: OKABE_ITO.vermillion
                     },
                     y: {
                         field: 'Eigenverbrauch',
@@ -160,7 +161,7 @@ const spec = {
                 {
                     mark: 'area',
                     color: {
-                        value: '#74c476'
+                        value: OKABE_ITO.bluishGreen
                     },
                     y: {
                         field: 'Gesamt Erzeugung',
@@ -187,7 +188,7 @@ const spec = {
                 {
                     mark: 'area',
                     color: {
-                        value: '#fb6a4a'
+                        value: OKABE_ITO.vermillion
                     },
                     y: {
                         field: 'Energie vom Netz bezogen',
@@ -237,7 +238,7 @@ const spec = {
                 {
                     mark: 'line',
                     color: {
-                        value: '#0f767a'
+                        value: TEMPERATURE_MIN
                     },
                     y: {
                         field: 'tlmin',
@@ -262,7 +263,7 @@ const spec = {
                 {
                     mark: 'line',
                     color: {
-                        value: '#fd2c3b'
+                        value: TEMPERATURE_MAX
                     },
                     y: {
                         field: 'tlmax',
@@ -310,7 +311,7 @@ const spec = {
                 {
                     mark: 'bar',
                     color: {
-                        value: '#fecc5c'
+                        value: OKABE_ITO.yellow
                     },
                     y: {
                         field: 'sonnenscheindauer',
@@ -357,7 +358,7 @@ const spec = {
                     color: {
                         field: 'niederschlagsart_24h',
                         type: 'nominal',
-                        range: ['#9ecae1', '#6baed6', '#4292c6', '#2171b5', '#084594'],
+                        range: CATEGORICAL.slice(0, 5),
                         legend: true,
                         title: 'Type'
                     },

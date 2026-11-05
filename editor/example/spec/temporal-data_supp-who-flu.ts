@@ -1,4 +1,5 @@
 import type { GoslingSpec } from '@gosling-lang/gosling-schema';
+import { yearColors } from './palette';
 
 // Supplementary material, Fig. S7 (WHO Flu Data; paper Fig. 1A).
 // Copied from the supplementary PDF (a fragment, wrapped in a root object). Fixed since
@@ -24,7 +25,7 @@ const YEARS = {
     field: 'ISO_YEAR',
     type: 'nominal',
     domain: ['2010', '2011', '2012', '2013', '2014'],
-    range: ['#C635BB', '#E5C011', '#12C340', '#1279C3', '#CC2F06'],
+    range: yearColors(['2010', '2011', '2012', '2013', '2014']),
     title: 'Year'
 } as const;
 

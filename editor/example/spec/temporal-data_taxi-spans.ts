@@ -1,4 +1,5 @@
 import type { GoslingSpec } from '@gosling-lang/gosling-schema';
+import { OKABE_ITO } from './palette';
 
 // NYC taxi trips from a start time and a duration. The CSV stores each trip's duration in seconds
 // (`trip_duration`), a span without a position in time; the `span` transform turns it into an interval from
@@ -27,7 +28,7 @@ const VENDOR_COLOR = {
     field: 'vendor',
     type: 'nominal',
     domain: ['Creative Mobile Technologies', 'VeriFone'],
-    range: ['#1f77b4', '#ff7f0e'],
+    range: [OKABE_ITO.blue, OKABE_ITO.orange],
     legend: true,
     title: 'Vendor'
 } as const;

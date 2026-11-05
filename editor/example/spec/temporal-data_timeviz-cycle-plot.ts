@@ -1,4 +1,5 @@
 import type { GoslingSpec } from '@gosling-lang/gosling-schema';
+import { REFERENCE, SINGLE } from './palette';
 
 // TimeViz Browser: Cycle Plot (Cleveland 1993, "Visualizing Data", Hobart Press; Cleveland, Dunn & Terpenning 1978).
 // The horizontal axis is cut into the positions of the cycle (here the 12 months); each position holds its own small
@@ -21,8 +22,8 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 
 const RATE = { field: 'rate', type: 'quantitative', domain: [0, 30], title: 'Unemployment rate (%)' } as const;
 
-const LINE = { mark: 'line', color: { value: '#c44e52' }, size: { value: 1.5 } } as const;
-const MEAN = { mark: 'rule', color: { value: '#555555' }, strokeWidth: { value: 1.5 } } as const;
+const LINE = { mark: 'line', color: { value: SINGLE }, size: { value: 1.5 } } as const;
+const MEAN = { mark: 'rule', color: { value: REFERENCE }, strokeWidth: { value: 1.5 } } as const;
 
 /** One month: its values from 2000 to 2009 in time order, and their mean. Only January has the y axis. */
 function monthPanel(name: string, i: number) {

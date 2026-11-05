@@ -1,4 +1,5 @@
 import type { GoslingSpec } from '@gosling-lang/gosling-schema';
+import { BRUSH, industryColors } from './palette';
 
 // Reproduces the paper's running example (Section 3, Figure 4): monthly
 // unemployment counts across five U.S. industry sectors (2000-2010),
@@ -7,7 +8,7 @@ import type { GoslingSpec } from '@gosling-lang/gosling-schema';
 // overlaid line mark and a shared chronological time scale.
 
 const SECTORS = ['Government', 'Manufacturing', 'Construction', 'Information', 'Education and Health'];
-const COLORS = ['#4C72B0', '#DD8452', '#55A868', '#C44E52', '#8172B2'];
+const COLORS = industryColors(SECTORS);
 
 const data = {
     url: 'https://raw.githubusercontent.com/vega/vega/main/docs/data/unemployment-across-industries.json',
@@ -64,7 +65,7 @@ export const EX_SPEC_TEMPORAL_UNEMPLOYMENT_CIRCULAR_LINEAR: GoslingSpec = {
                         {
                             mark: 'brush',
                             x: { linkingId: 'unemployment-brush' },
-                            color: { value: 'steelBlue' }
+                            color: { value: BRUSH }
                         }
                     ],
                     width: 420,

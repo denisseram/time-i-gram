@@ -1,4 +1,5 @@
 import type { GoslingSpec } from '@gosling-lang/gosling-schema';
+import { PRECIPITATION, TEMPERATURE_MAX, TEMPERATURE_MIN, weatherColors } from './palette';
 
 // Supplementary material, Fig. S4 (Seattle Weather).
 // Copied from the supplementary PDF (a fragment starting at `views: [...]`, wrapped in a root object). It reads the
@@ -37,7 +38,7 @@ const spec = {
                     title: 'Daily precipitation',
                     mark: 'bar',
                     size: { value: 5 },
-                    color: { value: '#002a33' },
+                    color: { value: PRECIPITATION },
                     y: {
                         field: 'precipitation',
                         type: 'quantitative',
@@ -76,7 +77,7 @@ const spec = {
 
             tracks: [
                 {
-                    color: { value: '#fd2c3b' },
+                    color: { value: TEMPERATURE_MAX },
                     y: {
                         field: 'temp_max',
                         type: 'quantitative',
@@ -86,7 +87,7 @@ const spec = {
                     style: { legendTitle: 'Temperature', legendLabel: 'Maximum' }
                 },
                 {
-                    color: { value: '#0f767a' },
+                    color: { value: TEMPERATURE_MIN },
                     y: {
                         field: 'temp_min',
                         type: 'quantitative',
@@ -128,7 +129,7 @@ const spec = {
                         field: 'weather',
                         type: 'nominal',
                         domain: ['drizzle', 'rain', 'snow', 'sun', 'fog'],
-                        range: ['#377750', '#002a33', '#74171f', '#cb4c47', '#35618f'],
+                        range: weatherColors(['drizzle', 'rain', 'snow', 'sun', 'fog']),
                         legend: true,
                         title: 'Weather'
                     },
@@ -149,7 +150,7 @@ const spec = {
                         field: 'weather',
                         type: 'nominal',
                         domain: ['drizzle', 'rain', 'snow', 'sun', 'fog'],
-                        range: ['#377750', '#002a33', '#74171f', '#cb4c47', '#35618f']
+                        range: ['#377750', PRECIPITATION, '#74171f', '#cb4c47', '#35618f']
                     },
                     visibility: [
                         {

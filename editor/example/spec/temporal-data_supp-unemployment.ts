@@ -1,4 +1,5 @@
 import type { GoslingSpec } from '@gosling-lang/gosling-schema';
+import { BRUSH, SINGLE, industryColors } from './palette';
 
 // Supplementary material, Fig. S3 (U.S. Unemployment Across Industries; paper Fig. 4).
 // Copied from the supplementary PDF and wrapped in a TS export. Fixed since: removed `genomicFields`,
@@ -54,6 +55,7 @@ const spec = {
                         field: 'series',
                         type: 'nominal',
                         domain: industries,
+                        range: industryColors(industries),
                         // one legend for the five overlaid rings, in the center of the ring
                         legend: i === 0,
                         title: 'Industry'
@@ -66,7 +68,7 @@ const spec = {
                 {
                     mark: 'brush',
                     x: { linkingId: 'detail-link' },
-                    color: { value: 'steelBlue' }
+                    color: { value: BRUSH }
                 }
             ]
         },
@@ -128,6 +130,7 @@ const spec = {
                                 field: 'series',
                                 type: 'nominal',
                                 domain: industries,
+                                range: industryColors(industries),
                                 legend: true,
                                 title: 'Industry'
                             },
@@ -193,6 +196,7 @@ const spec = {
                                 field: 'series',
                                 type: 'nominal',
                                 domain: industries,
+                                range: industryColors(industries),
                                 legend: true,
                                 title: 'Industry'
                             },
@@ -224,7 +228,7 @@ const spec = {
                                 type: 'quantitative',
                                 axis: 'none'
                             },
-                            color: { value: '#94a3b8' },
+                            color: { value: SINGLE },
                             mark: 'bar',
                             width: 500,
                             height: 60,
@@ -233,7 +237,7 @@ const spec = {
                         {
                             mark: 'brush',
                             x: { linkingId: 'detail-link' },
-                            color: { value: 'steelBlue' }
+                            color: { value: BRUSH }
                         }
                     ]
                 }

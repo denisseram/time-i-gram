@@ -1,4 +1,5 @@
 import type { GoslingSpec } from '@gosling-lang/gosling-schema';
+import { BRUSH, OKABE_ITO, REFERENCE } from './palette';
 
 // Hourly PM2.5 at two stations of the Beijing Multi-Site Air-Quality Data (Zhang et al. 2017; UCI, CC BY 4.0),
 // March 2013 to February 2017. The CSVs are the UCI files, unmodified: the time is in four columns (`year`, `month`,
@@ -53,9 +54,9 @@ const PM25_TITLE = 'PM2.5 (µg/m³)';
 // the legend's title is short: a quantitative legend is drawn inside its track, which is narrow here
 const PM25_COLOR = { ...PM25, domain: [0, 300], range: 'hot', title: 'µg/m³' } as const;
 
-const ORANGE = '#c4620f';
-const BLUE = '#2c5d8f';
-const GREY = '#7f8b99';
+const ORANGE = OKABE_ITO.orange;
+const BLUE = OKABE_ITO.blue;
+const GREY = REFERENCE;
 
 const CALENDAR_X = {
     field: 'year',
@@ -86,7 +87,15 @@ function heatingYears(data: object, name: string, color: string) {
 }
 
 /** One station's PM2.5 in absolute time, `timeUnit` as given. */
-function stationTrack(data: object, name: string, color: string, timeUnit: unknown, yMax: number, height: number, more: object[]) {
+function stationTrack(
+    data: object,
+    name: string,
+    color: string,
+    timeUnit: unknown,
+    yMax: number,
+    height: number,
+    more: object[]
+) {
     return {
         title: name,
         alignment: 'overlay',
@@ -197,9 +206,15 @@ const spec = {
             xDomain: { interval: ['2013-Q2', '2016-Q4'] },
             spacing: 0,
             tracks: [
-                stationTrack(DONGSI, 'Overview, weekly means (brush to zoom the detail): Dongsi (urban)', ORANGE, 'week', 400, 110, [
-                    { mark: 'brush', x: { linkingId: 'beijing' }, color: { value: 'steelBlue' } }
-                ]),
+                stationTrack(
+                    DONGSI,
+                    'Overview, weekly means (brush to zoom the detail): Dongsi (urban)',
+                    ORANGE,
+                    'week',
+                    400,
+                    110,
+                    [{ mark: 'brush', x: { linkingId: 'beijing' }, color: { value: BRUSH } }]
+                ),
                 stationTrack(DINGLING, 'Dingling (rural)', BLUE, 'week', 400, 110, [])
             ]
         },
@@ -208,10 +223,18 @@ const spec = {
             linkingId: 'beijing',
             spacing: 0,
             tracks: [
-                stationTrack(DONGSI, 'Detail, hourly (daily means above 30 days; hover for the time): Dongsi (urban)', ORANGE, DETAIL_UNITS, 900, 170, [
-                    hoverPoints('Dongsi', ORANGE)
-                ]),
-                stationTrack(DINGLING, 'Dingling (rural)', BLUE, DETAIL_UNITS, 900, 170, [hoverPoints('Dingling', BLUE)])
+                stationTrack(
+                    DONGSI,
+                    'Detail, hourly (daily means above 30 days; hover for the time): Dongsi (urban)',
+                    ORANGE,
+                    DETAIL_UNITS,
+                    900,
+                    170,
+                    [hoverPoints('Dongsi', ORANGE)]
+                ),
+                stationTrack(DINGLING, 'Dingling (rural)', BLUE, DETAIL_UNITS, 900, 170, [
+                    hoverPoints('Dingling', BLUE)
+                ])
             ]
         }
     ]

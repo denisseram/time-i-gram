@@ -1,4 +1,5 @@
 import type { GoslingSpec } from '@gosling-lang/gosling-schema';
+import { BRUSH, OKABE_ITO } from './palette';
 
 // Lives and masterpieces of 24 novelists born after 1700, from Wikidata (CC0): two SPARQL queries run on
 // 2026-10-15, whose CSV exports are used unedited (time-i-gram-datasets/novelists, with the queries). A
@@ -49,8 +50,9 @@ const NAMES = [
 ];
 const ROW = { field: 'writerLabel', type: 'nominal', domain: ['', ...NAMES] } as const;
 
-const LIFE_COLOR = '#d9d4c7';
-const WORK_COLOR = '#8c2d04';
+const LIFE_COLOR = OKABE_ITO.skyBlue;
+// black: it stands out on the sky-blue lives (vermillion does not)
+const WORK_COLOR = OKABE_ITO.black;
 
 /** Works: the dot size is the number of Wikipedias with an article about the work. */
 const workMarks = {
@@ -139,7 +141,7 @@ const spec = {
                                     data: WRITERS,
                                     mark: 'brush',
                                     x: { linkingId: 'age' },
-                                    color: { value: 'steelBlue' },
+                                    color: { value: BRUSH },
                                     opacity: { value: 0.15 }
                                 }
                             ],
@@ -153,7 +155,12 @@ const spec = {
                         {
                             title: 'Ages: lives and first editions, aligned to each birth',
                             alignment: 'overlay',
-                            x: { ...AGE, field: 'birth', axis: 'bottom', domain: { interval: ['15 years', '60 years'] } },
+                            x: {
+                                ...AGE,
+                                field: 'birth',
+                                axis: 'bottom',
+                                domain: { interval: ['15 years', '60 years'] }
+                            },
                             row: ROW,
                             tracks: [
                                 {
@@ -166,7 +173,12 @@ const spec = {
                                 {
                                     ...workMarks,
                                     data: WORKS,
-                                    x: { ...AGE, field: 'published', axis: 'bottom', domain: { interval: ['15 years', '60 years'] } }
+                                    x: {
+                                        ...AGE,
+                                        field: 'published',
+                                        axis: 'bottom',
+                                        domain: { interval: ['15 years', '60 years'] }
+                                    }
                                 }
                             ],
                             width: 800,

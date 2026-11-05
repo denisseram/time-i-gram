@@ -1,4 +1,5 @@
 import type { GoslingSpec } from '@gosling-lang/gosling-schema';
+import { industryColors, seasonColors } from './palette';
 
 // The relative time coordinate system: `x.relative` re-expresses time as a signed offset from a reference
 // event, and the axis labels offsets ("-4 wk", "0", "+8 wk") instead of dates.
@@ -60,6 +61,7 @@ const spec = {
                         field: 'season',
                         type: 'nominal',
                         domain: ['2009/10', '2010/11', '2011/12', '2012/13', '2013/14', '2014/15'],
+                        range: seasonColors(['2009/10', '2010/11', '2011/12', '2012/13', '2013/14', '2014/15']),
                         legend: true,
                         title: 'Season'
                     },
@@ -93,7 +95,14 @@ const spec = {
                         axis: 'left',
                         title: 'Unemployment rate (%)'
                     },
-                    color: { field: 'series', type: 'nominal', domain: SERIES, legend: true, title: 'Industry' },
+                    color: {
+                        field: 'series',
+                        type: 'nominal',
+                        domain: SERIES,
+                        range: industryColors(SERIES),
+                        legend: true,
+                        title: 'Industry'
+                    },
                     tracks: [{ mark: 'line', size: { value: 2 } }],
                     width: 800,
                     height: 200

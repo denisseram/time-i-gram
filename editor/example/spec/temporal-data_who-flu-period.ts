@@ -1,4 +1,5 @@
 import type { GoslingSpec } from '@gosling-lang/gosling-schema';
+import { BRUSH, REFERENCE, yearColors } from './palette';
 
 // WHO flu (USA), rebuilt with the period coordinate system from the original `who_flu_usa.csv`.
 // Supplementary Fig. S7 / paper Fig. 1A drew its ring from a hand-made file in which every date was moved
@@ -27,7 +28,7 @@ const YEAR_COLOR = {
     field: 'year',
     type: 'nominal',
     domain: ['2010', '2011', '2012', '2013', '2014'],
-    range: ['#C635BB', '#E5C011', '#12C340', '#1279C3', '#CC2F06'],
+    range: yearColors(['2010', '2011', '2012', '2013', '2014']),
     title: 'Year'
 } as const;
 
@@ -57,7 +58,7 @@ const spec = {
                                 {
                                     mark: 'brush',
                                     x: { linkingId: 'weeks' },
-                                    color: { value: 'gray' },
+                                    color: { value: BRUSH },
                                     opacity: { value: 0.12 }
                                 }
                             ],
@@ -99,7 +100,7 @@ const spec = {
                     mark: 'bar',
                     x: { field: 'ISO_YEAR', type: 'temporal', axis: 'bottom', domain: { interval: ['2010', '2014'] } },
                     y: CASES,
-                    color: { value: 'black' },
+                    color: { value: REFERENCE },
                     size: { value: 2 },
                     width: 820,
                     height: 100

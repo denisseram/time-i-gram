@@ -1,4 +1,5 @@
 import type { GoslingSpec } from '@gosling-lang/gosling-schema';
+import { OKABE_ITO, REFERENCE, SINGLE } from '../spec/palette';
 
 // Doc examples of time input formats (not figures): a date and a time of day in two columns, and Unix timestamps
 // in seconds and in milliseconds.
@@ -10,8 +11,7 @@ import type { GoslingSpec } from '@gosling-lang/gosling-schema';
  */
 export const TIME_INPUT_DATE_AND_TIME: GoslingSpec = {
     title: 'When in the day do New York crashes happen?',
-    subtitle:
-        'Collisions in June 2024, from a date and a time-of-day column. Source: NYPD, NYC Open Data (h9gi-nx95)',
+    subtitle: 'Collisions in June 2024, from a date and a time-of-day column. Source: NYPD, NYC Open Data (h9gi-nx95)',
     tracks: [
         {
             title: 'Crashes per hour (per day when more than 10 days are visible)',
@@ -32,8 +32,15 @@ export const TIME_INPUT_DATE_AND_TIME: GoslingSpec = {
                 axis: 'bottom',
                 domain: { interval: ['2024-06-03', '2024-06-09'] }
             },
-            y: { field: 'crash_time', type: 'quantitative', aggregate: 'count', domain: [0, 50], axis: 'left', title: 'Crashes' },
-            color: { value: '#4e79a7' },
+            y: {
+                field: 'crash_time',
+                type: 'quantitative',
+                aggregate: 'count',
+                domain: [0, 50],
+                axis: 'left',
+                title: 'Crashes'
+            },
+            color: { value: SINGLE },
             tooltip: [
                 { field: 'crash_date', type: 'temporal', alt: 'Hour' },
                 { field: 'crash_time', type: 'quantitative', alt: 'Crashes' }
@@ -67,7 +74,7 @@ function apolloTrack(unit: 's' | 'ms', title: string, axis: 'top' | 'bottom') {
         },
         x: { field: 't', type: 'temporal', axis, domain: { interval: ['1969-07-16', '1969-07-25'] } },
         tracks: [
-            { mark: 'point', color: { value: '#e15759' }, size: { value: 5 } },
+            { mark: 'point', color: { value: OKABE_ITO.vermillion }, size: { value: 5 } },
             // labels below the points, except First step above, so that the events of 20 and 21 July do not overlap
             ...[
                 [false, -12],
@@ -76,7 +83,7 @@ function apolloTrack(unit: 's' | 'ms', title: string, axis: 'top' | 'bottom') {
                 mark: 'text',
                 dataTransform: [{ type: 'filter', field: 'event', oneOf: ['First step'], not: !below }],
                 text: { field: 'event', type: 'nominal' },
-                color: { value: '#333333' },
+                color: { value: REFERENCE },
                 style: { dy, textFontSize: 11 }
             }))
         ],

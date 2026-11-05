@@ -1,4 +1,5 @@
 import type { GoslingSpec } from '@gosling-lang/gosling-schema';
+import { seasonColors } from './palette';
 
 // Brehmer et al. (2017) design #13: radial representation x relative scale x faceted layout.
 // Each influenza season (ISO week 40 to week 39 of the next year, `groupby: { period: ... }`) is aligned to its own
@@ -20,7 +21,7 @@ const FLU = {
 
 /** The seasons, outer ring first, after an empty row under the header; the same colors in every WHO figure. */
 const SEASONS = ['2010/11', '2011/12', '2012/13', '2013/14', '2014/15'];
-const SEASON_COLORS = ['#E5C011', '#12C340', '#1279C3', '#CC2F06', '#7B3294'];
+const COLORS = seasonColors(SEASONS);
 
 const spec = {
     title: 'Do influenza seasons look alike once aligned to their own peak?',
@@ -50,7 +51,7 @@ const spec = {
                 field: 'season',
                 type: 'nominal',
                 domain: SEASONS,
-                range: SEASON_COLORS,
+                range: COLORS,
                 legend: true,
                 title: 'Season'
             },

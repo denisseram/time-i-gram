@@ -1,4 +1,5 @@
 import type { GoslingSpec } from '@gosling-lang/gosling-schema';
+import { OKABE_ITO } from './palette';
 
 // NASA C-MAPSS FD001 test set: 100 engines whose records stop some time before failure; the true remaining
 // useful life (RUL) at the last record is given separately. The preprocessed CSVs store each engine's failure
@@ -60,7 +61,7 @@ const spec = {
                         title: 'Health index (z, up = worse)'
                     },
                     // one line per engine: the color channel separates the lines, all drawn in one blue
-                    color: { field: 'unit', type: 'nominal', domain: BY_RUL, range: ['#4e79a7'] },
+                    color: { field: 'unit', type: 'nominal', domain: BY_RUL, range: [OKABE_ITO.blue] },
                     opacity: { value: 0.4 },
                     size: { value: 1 },
                     width: 800,
@@ -81,10 +82,14 @@ const spec = {
                     tracks: [
                         {
                             mark: 'rect',
-                            color: { value: '#4e79a7' },
+                            color: { value: OKABE_ITO.blue },
                             style: { legendTitle: 'Cycles', legendLabel: 'Observed' }
                         },
-                        { mark: 'rect', color: { value: '#f9be86' }, style: { legendLabel: 'Remaining useful life' } }
+                        {
+                            mark: 'rect',
+                            color: { value: OKABE_ITO.orange },
+                            style: { legendLabel: 'Remaining useful life' }
+                        }
                     ],
                     width: 800,
                     height: 20
@@ -98,7 +103,7 @@ const spec = {
                             mark: 'rect',
                             x: { ...X, field: 'start_date' },
                             xe: { field: 'last_date', type: 'temporal' },
-                            color: { value: '#4e79a7' }
+                            color: { value: OKABE_ITO.blue }
                         },
                         {
                             mark: 'rect',
@@ -108,7 +113,7 @@ const spec = {
                             x: { ...X, field: 'last_date' },
                             xe: { field: 'end', type: 'temporal' },
                             // opaque: a rect that spans two tiles is drawn by both
-                            color: { value: '#f9be86' }
+                            color: { value: OKABE_ITO.orange }
                         }
                     ],
                     width: 800,

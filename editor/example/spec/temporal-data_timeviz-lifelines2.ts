@@ -1,4 +1,5 @@
 import type { GoslingSpec } from '@gosling-lang/gosling-schema';
+import { weatherColors } from './palette';
 
 // TimeViz Browser: LifeLines2 (Wang, Plaisant, Shneiderman et al. 2009, "Temporal Summaries: Supporting Temporal
 // Categorical Searching, Aggregation and Comparison", IEEE TVCG 15, https://doi.org/10.1109/TVCG.2009.187).
@@ -22,7 +23,7 @@ const WEATHER = {
 
 const YEARS = ['2012', '2013', '2014', '2015'];
 const CATEGORIES = ['rain', 'drizzle', 'snow', 'fog', 'sun'];
-const COLORS = ['#1f78b4', '#a6cee3', '#6a3d9a', '#999999', '#ff7f00'];
+const COLORS = weatherColors(CATEGORIES);
 
 const ALIGNED_X = {
     field: 'date',

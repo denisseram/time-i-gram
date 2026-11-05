@@ -1,4 +1,5 @@
 import type { GoslingSpec } from '@gosling-lang/gosling-schema';
+import { OKABE_ITO, REFERENCE } from './palette';
 
 // NASA C-MAPSS FD001: 100 simulated turbofan engines run from a healthy state to failure (Saxena et al., PHM08).
 // The data count operational cycles, not dates: the preprocessed CSV gives every engine a synthetic clock
@@ -28,7 +29,7 @@ const HIGHLIGHT_COLOR = {
     field: 'engine',
     type: 'nominal',
     domain: HIGHLIGHT.map(h => h.to),
-    range: ['#e15759', '#f28e2b', '#4e79a7'],
+    range: [OKABE_ITO.vermillion, OKABE_ITO.orange, OKABE_ITO.blue],
     legend: true,
     title: 'Engine'
 } as const;
@@ -61,7 +62,7 @@ function view(anchor: 'first' | 'last', title: string, label: string, interval: 
                     {
                         // one line per engine: the color channel separates the lines, all drawn in one grey
                         mark: 'line',
-                        color: { field: 'unit', type: 'nominal', range: ['#9aa5b1'] },
+                        color: { field: 'unit', type: 'nominal', range: [OKABE_ITO.skyBlue] },
                         opacity: { value: 0.35 },
                         size: { value: 1 }
                     },
@@ -78,7 +79,7 @@ function view(anchor: 'first' | 'last', title: string, label: string, interval: 
                         mark: 'line',
                         x: { ...x, timeUnit: 'week' },
                         y: { ...Y, aggregate: 'mean' },
-                        color: { value: '#1b1f24' },
+                        color: { value: REFERENCE },
                         size: { value: 3 },
                         style: { legendLabel: 'Fleet mean' }
                     }

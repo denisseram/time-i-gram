@@ -1,4 +1,5 @@
 import type { GoslingSpec } from '@gosling-lang/gosling-schema';
+import { BRUSH, SINGLE } from './palette';
 
 // TimeViz Browser: SolarPlot (Chuah 1998, "Dynamic Aggregation with Circular Visual Designs", IEEE InfoVis,
 // https://doi.org/10.1109/INFVIS.1998.729557).
@@ -51,11 +52,11 @@ const spec = {
                         title: 'Rainy days per bin, 0 to 25 (beam length)'
                     },
                     tracks: [
-                        { mark: 'bar', color: { value: '#2c7fb8' } },
+                        { mark: 'bar', color: { value: SINGLE } },
                         {
                             mark: 'brush',
                             x: { linkingId: 'solar-detail' },
-                            color: { value: 'steelBlue' },
+                            color: { value: BRUSH },
                             opacity: { value: 0.15 }
                         }
                     ],
@@ -80,7 +81,7 @@ const spec = {
                         domain: { interval: ['2014-09', '2015-04'] }
                     },
                     y: { ...RAINY_DAYS, domain: [0, 25], axis: 'left', title: 'Rainy days per bin' },
-                    color: { value: '#2c7fb8' },
+                    color: { value: SINGLE },
                     width: 620,
                     height: 300
                 }

@@ -1,4 +1,5 @@
 import type { GoslingSpec } from '@gosling-lang/gosling-schema';
+import { CATEGORICAL, OKABE_ITO } from './palette';
 
 // FitBit heart rate (one participant, 12 April to 12 May 2016) in two period coordinate systems, as hourly means
 // (`timeUnit: "hour"` with `aggregate: "mean"`):
@@ -17,7 +18,8 @@ const ONE_PARTICIPANT = [{ type: 'filter', field: 'Id', oneOf: ['2022484408'] }]
 
 const spec = {
     title: 'FitBit heart rate: is it higher at weekends, and at what time of day?',
-    subtitle: 'Hourly means of one participant, April to May 2016; left: a ring per week, right: all days. Source: Furberg et al. 2016',
+    subtitle:
+        'Hourly means of one participant, April to May 2016; left: a ring per week, right: all days. Source: Furberg et al. 2016',
     arrangement: 'horizontal',
     // room for the ring's labels on its right
     spacing: 40,
@@ -48,7 +50,13 @@ const spec = {
                         title: 'Heart rate (bpm)'
                     },
                     row: { field: 'week', type: 'nominal' },
-                    color: { field: 'week', type: 'nominal', legend: true, title: 'Week (outer: first)' },
+                    color: {
+                        field: 'week',
+                        type: 'nominal',
+                        range: CATEGORICAL,
+                        legend: true,
+                        title: 'Week (outer: first)'
+                    },
                     size: { value: 1.5 },
                     width: 420,
                     height: 160
@@ -71,7 +79,7 @@ const spec = {
                         axis: 'left',
                         title: 'Heart rate (bpm)'
                     },
-                    color: { value: '#d62728' },
+                    color: { value: OKABE_ITO.vermillion },
                     stroke: { value: 'white' },
                     strokeWidth: { value: 1 },
                     width: 480,

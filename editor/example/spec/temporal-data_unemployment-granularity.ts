@@ -1,4 +1,5 @@
 import type { GoslingSpec } from '@gosling-lang/gosling-schema';
+import { industryColors } from './palette';
 
 // U.S. unemployment rate by industry, shown by calendar unit instead of raw timestamps, with granularity
 // transition rules: `x.timeUnit` is a list of rules, so the same track is drawn by month while less than
@@ -16,7 +17,14 @@ const UNEMPLOYMENT = {
 
 const SERIES = ['Construction', 'Manufacturing', 'Finance', 'Information', 'Education and Health'];
 const SERIES_FILTER = [{ type: 'filter', field: 'series', oneOf: SERIES }] as const;
-const SERIES_COLOR = { field: 'series', type: 'nominal', domain: SERIES, legend: true, title: 'Industry' } as const;
+const SERIES_COLOR = {
+    field: 'series',
+    type: 'nominal',
+    domain: SERIES,
+    range: industryColors(SERIES),
+    legend: true,
+    title: 'Industry'
+} as const;
 const RATE = {
     field: 'rate',
     type: 'quantitative',

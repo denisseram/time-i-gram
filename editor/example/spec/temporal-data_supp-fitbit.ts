@@ -1,4 +1,5 @@
 import type { GoslingSpec } from '@gosling-lang/gosling-schema';
+import { OKABE_ITO, REFERENCE } from './palette';
 
 // Supplementary material, Fig. S8 (FitBit Activity and Heart Rate Data; paper Fig. 5).
 // Copied from the supplementary PDF. Fixed since (docs/grammar-audit.md §7): the domain covers the
@@ -46,7 +47,7 @@ const fitbitSpec = {
                             dataTransform: PARTICIPANT,
                             data: HEART_RATE,
                             mark: 'line',
-                            color: { value: 'red' },
+                            color: { value: OKABE_ITO.vermillion },
                             x: {
                                 field: 'Time',
                                 type: 'temporal',
@@ -81,7 +82,7 @@ const fitbitSpec = {
                         {
                             mark: 'bar',
                             size: { value: 6 },
-                            color: { value: '#f28e2b' },
+                            color: { value: OKABE_ITO.orange },
                             y: {
                                 field: 'TotalSteps',
                                 type: 'quantitative',
@@ -92,7 +93,7 @@ const fitbitSpec = {
                         },
                         {
                             mark: 'line',
-                            color: { value: 'black' },
+                            color: { value: REFERENCE },
                             y: {
                                 field: 'VeryActiveMinutes',
                                 type: 'quantitative',
@@ -117,7 +118,7 @@ const fitbitSpec = {
                             dataTransform: PARTICIPANT,
                             data: HEART_RATE,
                             mark: 'line',
-                            color: { value: 'red' },
+                            color: { value: OKABE_ITO.vermillion },
                             x: {
                                 field: 'Time',
                                 type: 'temporal',

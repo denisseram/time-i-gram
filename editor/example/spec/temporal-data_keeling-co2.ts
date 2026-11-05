@@ -1,4 +1,5 @@
 import type { GoslingSpec } from '@gosling-lang/gosling-schema';
+import { REFERENCE } from './palette';
 
 // Monthly mean CO2 at Mauna Loa, March 1958 to April 2020 (the Keeling curve; NOAA GML and Scripps), as published in
 // vega-datasets: `Date`, `CO2` (ppm) and `adjusted CO2` (the seasonal cycle removed).
@@ -49,7 +50,13 @@ function decadeRing(decade: string) {
             axis: decade === '2010s' ? 'top' : 'none'
         },
         tracks: [
-            { mark: 'line', y: y('adjusted CO2'), color: { value: '#bdbdbd' }, size: { value: 1.5 } },
+            {
+                mark: 'line',
+                y: y('adjusted CO2'),
+                color: { value: REFERENCE },
+                opacity: { value: 0.3 },
+                size: { value: 1.5 }
+            },
             { mark: 'line', y: y('CO2'), color: { value: DECADE_COLORS[i] }, size: { value: 1.2 } }
         ],
         width: 600,
@@ -72,7 +79,9 @@ const spec = {
                     centerRadius: 0.3,
                     spacing: 2,
                     // one ring per decade (outer: the 2010s; the 2020s have 4 months), each with its own CO2 scale
-                    tracks: DECADES.filter(d => d !== '2020s').reverse().map(decadeRing)
+                    tracks: DECADES.filter(d => d !== '2020s')
+                        .reverse()
+                        .map(decadeRing)
                 }
             ]
         },
@@ -93,12 +102,32 @@ const spec = {
                         axis: 'bottom',
                         domain: { interval: ['1958', '2020'] }
                     },
-                    y: { field: 'CO2', type: 'quantitative', aggregate: 'mean', domain: [310, 420], axis: 'left', title: PPM },
+                    y: {
+                        field: 'CO2',
+                        type: 'quantitative',
+                        aggregate: 'mean',
+                        domain: [310, 420],
+                        axis: 'left',
+                        title: PPM
+                    },
                     // the decade of each row, as a readable label (not seconds), colors the line
                     dataTransform: [
-                        { type: 'timeUnit', field: 'Date', unit: 'decade', newField: 'decade_start', labelField: 'decade' }
+                        {
+                            type: 'timeUnit',
+                            field: 'Date',
+                            unit: 'decade',
+                            newField: 'decade_start',
+                            labelField: 'decade'
+                        }
                     ],
-                    color: { field: 'decade', type: 'nominal', domain: DECADES, range: DECADE_COLORS, legend: true, title: 'Decade' },
+                    color: {
+                        field: 'decade',
+                        type: 'nominal',
+                        domain: DECADES,
+                        range: DECADE_COLORS,
+                        legend: true,
+                        title: 'Decade'
+                    },
                     tracks: [
                         { mark: 'line', size: { value: 2 } },
                         {

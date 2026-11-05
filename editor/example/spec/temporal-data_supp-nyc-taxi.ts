@@ -1,4 +1,5 @@
 import type { GoslingSpec } from '@gosling-lang/gosling-schema';
+import { CATEGORICAL, SINGLE } from './palette';
 
 // Supplementary material, Fig. S6 (NYC Taxi Trip Duration; paper Fig. 1C).
 // Copied from the supplementary PDF (a fragment, wrapped in a root object). Since fixed:
@@ -55,7 +56,7 @@ const spec = {
                         }
                     ],
 
-                    stroke: { value: 'steelblue' },
+                    stroke: { value: SINGLE },
                     style: { linkStyle: 'elliptical', linkMinHeight: 0.05 },
                     width: 800,
                     height: 160
@@ -101,12 +102,14 @@ const spec = {
                     stroke: {
                         field: 'passenger_count',
                         type: 'nominal',
-                        domain: ['1', '2', '3', '4', '5', '6', '7']
+                        domain: ['1', '2', '3', '4', '5', '6', '7'],
+                        range: CATEGORICAL.slice(0, 7)
                     },
                     color: {
                         field: 'passenger_count',
                         type: 'nominal',
                         domain: ['1', '2', '3', '4', '5', '6', '7'],
+                        range: CATEGORICAL.slice(0, 7),
                         legend: true,
                         title: 'Passengers'
                     },

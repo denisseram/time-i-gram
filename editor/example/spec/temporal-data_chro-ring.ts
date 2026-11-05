@@ -1,4 +1,5 @@
 import type { GoslingSpec } from '@gosling-lang/gosling-schema';
+import { CATEGORICAL, OKABE_ITO, REFERENCE } from './palette';
 
 // A reproduction of the Chro-Ring "time ring" (Zhu et al., 2016) for the life of the Song dynasty writer Su Shi
 // (1036-1101), from the China Biographical Database (CBDB, release cbdb_20260530, CC BY-NC-SA 4.0): exports of his
@@ -30,11 +31,19 @@ const xe = (field: string) => ({ field, type: 'temporal' } as const);
 const EXILE_OFFICES = ['團練副使', '節度副使', '州別駕'];
 const CAPITAL = ['Kaifeng', 'Kaifeng Fu'];
 const KINDS = [
-    { label: 'In the capital (Kaifeng)', color: '#d6336c', filter: [{ type: 'filter', field: 'place', oneOf: CAPITAL }] },
-    { label: 'In exile', color: '#3b7dd8', filter: [{ type: 'filter', field: 'office_chn', oneOf: EXILE_OFFICES }] },
+    {
+        label: 'In the capital (Kaifeng)',
+        color: OKABE_ITO.vermillion,
+        filter: [{ type: 'filter', field: 'place', oneOf: CAPITAL }]
+    },
+    {
+        label: 'In exile',
+        color: OKABE_ITO.blue,
+        filter: [{ type: 'filter', field: 'office_chn', oneOf: EXILE_OFFICES }]
+    },
     {
         label: 'Elsewhere',
-        color: '#9a9a9a',
+        color: OKABE_ITO.skyBlue,
         filter: [
             { type: 'filter', field: 'place', oneOf: CAPITAL, not: true },
             { type: 'filter', field: 'office_chn', oneOf: EXILE_OFFICES, not: true }
@@ -48,7 +57,7 @@ const PLACED = [WITH_PLACE, { type: 'filter', field: 'end', oneOf: [''], not: tr
 const OPEN_ENDED = [WITH_PLACE, { type: 'filter', field: 'end', oneOf: [''] }];
 
 const CATEGORIES = ['Writings', 'Scholarship', 'Politics', 'Friendship', 'Associations (General)'];
-const CATEGORY_COLORS = ['#7b5ea7', '#3f88a8', '#c0507a', '#8c6d46', '#9a9a9a'];
+const CATEGORY_COLORS = CATEGORICAL.slice(0, CATEGORIES.length);
 
 const postingTooltip = [
     { field: 'place', type: 'nominal', alt: 'Place' },
@@ -66,11 +75,18 @@ const fitLabel = [
 const WIDTH = 900;
 /** The ring's diameter: it fits a screen below the life bar. */
 const RING = 620;
-const LAT = { field: 'lat', type: 'quantitative', domain: [18, 41], axis: 'left', title: 'Latitude of the place (°N)' } as const;
+const LAT = {
+    field: 'lat',
+    type: 'quantitative',
+    domain: [18, 41],
+    axis: 'left',
+    title: 'Latitude of the place (°N)'
+} as const;
 
 const spec = {
     title: 'Where did Su Shi serve, and whom did he write for, year by year? (Chro-Ring, 1036-1101)',
-    subtitle: 'Postings and dated associations of Su Shi. Source: China Biographical Database (CBDB 20260530, CC BY-NC-SA)',
+    subtitle:
+        'Postings and dated associations of Su Shi. Source: China Biographical Database (CBDB 20260530, CC BY-NC-SA)',
     arrangement: 'vertical',
     spacing: 30,
     views: [
@@ -89,7 +105,8 @@ const spec = {
                             mark: 'line',
                             dataTransform: [{ type: 'filter', field: 'place', oneOf: ['[Unknown]', ''], not: true }],
                             y: LAT,
-                            color: { value: '#c8c8c8' },
+                            color: { value: REFERENCE },
+                            opacity: { value: 0.25 },
                             size: { value: 1 }
                         },
                         ...KINDS.map((kind, i) => ({
@@ -116,7 +133,7 @@ const spec = {
                             xe: xe('end'),
                             y: LAT,
                             text: { field: 'place', type: 'nominal' },
-                            color: { value: '#333333' },
+                            color: { value: REFERENCE },
                             visibility: fitLabel,
                             style: { dy: -11, textFontSize: 9 }
                         }
@@ -137,7 +154,7 @@ const spec = {
                         mark: 'text',
                         dataTransform: [{ type: 'filter', field: 'year', oneOf: [String(year)] }],
                         text: { field: 'entry', type: 'nominal' },
-                        color: { value: '#333333' },
+                        color: { value: REFERENCE },
                         style: { dy, textFontSize: 9 }
                     })),
                     width: WIDTH,
@@ -209,7 +226,7 @@ const spec = {
                     dataTransform: [{ type: 'filter', field: 'place', oneOf: ['[Unknown]', ''] }],
                     mark: 'point',
                     x: x('start'),
-                    color: { value: '#555555' },
+                    color: { value: REFERENCE },
                     size: { value: 3 },
                     tooltip: postingTooltip,
                     width: RING,

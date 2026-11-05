@@ -1,4 +1,5 @@
 import type { GoslingSpec } from '@gosling-lang/gosling-schema';
+import { SINGLE } from './palette';
 
 // Brehmer et al. (2017) design #11: radial representation x chronological scale x faceted layout.
 // One revolution is the whole decade in absolute time (January 2000 to February 2010), and every industry is a
@@ -52,8 +53,8 @@ const spec = {
             tracks: [
                 {
                     mark: 'area',
-                    color: { value: '#c44e52' },
-                    stroke: { value: '#7a2427' },
+                    color: { value: SINGLE },
+                    stroke: { value: SINGLE },
                     strokeWidth: { value: 0.5 }
                 },
                 {

@@ -1,4 +1,5 @@
 import type { GoslingSpec } from '@gosling-lang/gosling-schema';
+import { BRUSH, INDUSTRY_COLORS, industryColors } from '../spec/palette';
 
 const data = {
     url: 'https://raw.githubusercontent.com/vega/vega/main/docs/data/unemployment-across-industries.json',
@@ -42,7 +43,13 @@ export const EX_SPEC_TEMPORAL_OVERVIEW_DETAIL: GoslingSpec = {
                 field: 'series',
                 type: 'nominal',
                 domain: ['Government', 'Manufacturing', 'Construction', 'Information', 'Education and Health'],
-                range: ['#d62728', '#2ca02c', '#1f77b4', '#ff7f0e', '#9467bd'],
+                range: industryColors([
+                    'Government',
+                    'Manufacturing',
+                    'Construction',
+                    'Information',
+                    'Education and Health'
+                ]),
                 legend: true,
                 title: 'Industry'
             },
@@ -55,16 +62,16 @@ export const EX_SPEC_TEMPORAL_OVERVIEW_DETAIL: GoslingSpec = {
                 {
                     mark: 'brush',
                     x: { linkingId: 'linking-with-brush' },
-                    color: { value: 'steelBlue' }
+                    color: { value: BRUSH }
                 }
             ],
             width: 800,
             height: 80
         },
-        detail('Government', '#d62728'),
-        detail('Manufacturing', '#2ca02c'),
-        detail('Construction', '#1f77b4'),
-        detail('Information', '#ff7f0e'),
-        detail('Education and Health', '#9467bd')
+        detail('Government', INDUSTRY_COLORS.Government),
+        detail('Manufacturing', INDUSTRY_COLORS.Manufacturing),
+        detail('Construction', INDUSTRY_COLORS.Construction),
+        detail('Information', INDUSTRY_COLORS.Information),
+        detail('Education and Health', INDUSTRY_COLORS['Education and Health'])
     ]
 };
